@@ -14,7 +14,7 @@ return (
                 ></Image>
         </div>
 
-        <div className="md:w-1/2 p-30 bg-blue-200  text-white shadow-lg">
+        <div className="md:w-1/2 p-30 bg-blue-300  text-white shadow-lg">
             <h1 className="text-3xl font-semibold mb-4">¿Quiénes somos?</h1>
           <p className="text-base leading-relaxed">
             En <strong>Sanare</strong>, creemos que la salud debe ser accesible,

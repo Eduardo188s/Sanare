@@ -8,6 +8,7 @@ export function Header(){
                 <div className="flex gap-4 text-sm">
                     <Link href="/" className="hover:underline font-bold rounded-full ">Home</Link>
                     <Link href="/about" className="hover:underline font-bold">About</Link>
+                    <Link href="/register" className="hover:underline font-bold">Login</Link>
                     <Link href="/register" className="hover:underline font-bold">Register</Link>
                 </div>
             </nav>
