@@ -1,6 +1,6 @@
 export function HomePage(){
   return(
-    <h1>assdasd</h1>
+    <h1>This is home</h1>
   )
 }
 
