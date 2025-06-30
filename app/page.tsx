@@ -16,13 +16,13 @@ export function HomePage() {
         </div>
       </div>
 
-      <div className="w-1/2 bg-blue-700 p-8 flex flex-col"> 
+      <div className="w-1/2 bg-[#6381A8] p-8 flex flex-col"> 
 
         
-        <div className="flex-grow flex flex-col items-center justify-center text-center p-12 text-white"> 
+        <div className="flex-grow flex flex-col items-center justify-center text-center p-12 text-white shadow-2xl"> 
           <h1 className="text-5xl font-light mb-8">Bienvenido</h1>
-          <p className="text-xl leading-relaxed max-w-2xl">
-            Sanare ha sido diseñada para hacer tu experiencia médica más
+          <p className="text-xl text-justify leading-relaxed max-w-2xl">
+            <strong>Sanare</strong> ha sido diseñada para hacer tu experiencia médica más
             simple, rápida y organizada. Desde esta plataforma podrás agendar
             tus citas, recibir recordatorios, consultar tu historial y encontrar el
             profesional de salud adecuado para ti. Nos comprometemos a
