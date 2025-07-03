@@ -19,12 +19,13 @@ export default function RegisterPage(){
                             </label>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-4 border border-gray-300 rounded px-4 py-2">
                             <input type="text" placeholder="Nombre" className="input" />
+
                             <input type="text" placeholder="Apellido" className="input"/>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4 border border-gray-300 rounded px-4 py-2">
                             <select className="input">
                                 <option>Área de salud</option>
                                 <option>Cirujano</option>
@@ -34,17 +35,17 @@ export default function RegisterPage(){
                             </select>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4 border border-gray-300 rounded px-4 py-2">
                             <input type="text" placeholder="Edad" className="input" />
                             <input type="text" placeholder="No." className="input" />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4 border border-gray-300 rounded px-4 py-2">
                             <input type="text" placeholder="Ciudad" className="input" />
                             <input type="text" placeholder="Postal" className="input" />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4 border border-gray-300 rounded px-4 py-2">
                             <input type="email" placeholder="E-Mail*" className="input" />
                             <input type="text" placeholder="Telefono" className="input" />
                         </div>
@@ -78,31 +79,22 @@ export default function RegisterPage(){
                               </label>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-2 text-white">
+                          <div className="grid grid-cols-2 gap-4 border border-white-300 rounded text-white px-4 py-2">
                               <input type="text" placeholder="Nombre" className="input" />
                               <input type="text" placeholder="Apellido" className="input"/>
                           </div>
-
-                          <div className="grid grid-cols-2 gap-4 text-white">
-                              <select className="input">
-                                  <option>Área de salud</option>
-                              </select>
-                              <select className="input">
-                                  <option>Clínica</option>
-                              </select>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-4 text-white">
+                          
+                          <div className="grid grid-cols-2 gap-4 border border-white-300 rounded text-white px-4 py-2">
                               <input type="text" placeholder="Edad" className="input" />
                               <input type="text" placeholder="No." className="input" />
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4 text-white">
+                          <div className="grid grid-cols-2 gap-4 border border-white-300 rounded text-white px-4 py-2">
                               <input type="text" placeholder="Ciudad" className="input" />
                               <input type="text" placeholder="Postal" className="input" />
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4 text-white">
+                          <div className="grid grid-cols-2 gap-4 border border-white-300 rounded text-white px-4 py-2">
                               <input type="email" placeholder="E-Mail*" className="input" />
                               <input type="text" placeholder="Telefono" className="input" />
                           </div>
