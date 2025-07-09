@@ -9,6 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@coreui/coreui": "^5.4.1",
+    "@coreui/react": "^5.7.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@heroui/react": "^2.7.11",
+    "@internationalized/date": "^3.8.2",
+    "@mui/icons-material": "^7.2.0",
+    "@mui/material": "^7.2.0",
+    "@mui/x-date-pickers": "^8.7.0",
+    "clsx": "^2.1.1",
+    "dayjs": "^1.11.13",
     "next": "15.3.3",
     "react": "^19.0.0",
     "react-datepicker": "^8.4.0",
