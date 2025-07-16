@@ -2,13 +2,14 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function NavbarPaciente() {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const router = useRouter();
 
   const handleConsultorioClick = () => {
-    router.push('/paciente/clinica');
+    router.push('/paciente');
   };
 
   return (
@@ -19,9 +20,9 @@ export default function NavbarPaciente() {
 
       <button
         onClick={handleConsultorioClick}
-        className={`font-semibold text-lg px-4 py-1 rounded transition-colors duration-300 text-blue-700`}
+        className={`font-semibold text-lg px-4 py-1 rounded transition-colors duration-300 text-blue-700 hover:bg-gray-50 cursor-pointer`}
       >
-        Citas
+        Paciente
       </button>
 
       <div className="flex items-center space-x-6">
@@ -77,7 +78,14 @@ export default function NavbarPaciente() {
         </div>
 
         <img src="/icono_notificaciones.png" alt="Notificaciones" className="h-8" />
-        <img src="/icono_paciente.png" alt="Perfil Médico" className="h-8" />
+        
+        
+        <img
+          src="/icono_paciente.png" 
+          alt="Perfil Médico" 
+          className="h-8 cursor-pointer"
+          onClick={() => router.push('/paciente/perfil')}
+            />
       </div>
     </nav>
   );

@@ -26,7 +26,7 @@ export default function LoginPage() {
               <div className="mb-4">
                 <input
                   type="email"
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#6381A8]"
+                  className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                   placeholder="Correo Electrónico"
                   required
                 />
@@ -34,7 +34,7 @@ export default function LoginPage() {
               <div className="mb-6">
                 <input
                   type="password"
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#6381A8]"
+                  className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                   placeholder="Contraseña"
                   required
                 />

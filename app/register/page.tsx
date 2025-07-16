@@ -19,35 +19,61 @@ export default function RegisterPage(){
                             </label>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 border border-gray-300 rounded px-4 py-2">
-                            <input type="text" placeholder="Nombre" className="input" />
+                        <div className="grid grid-cols-2 gap-4  rounded px-4 py-2 ">
+                            <input 
+                                type="text" 
+                                placeholder="Nombre" 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
 
-                            <input type="text" placeholder="Apellido" className="input"/>
+                            <input 
+                                type="text" 
+                                placeholder="Apellido" 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 border border-gray-300 rounded px-4 py-2">
-                            <select className="input">
-                                <option>Área de salud</option>
-                                <option>Cirujano</option>
+                        <div className="grid grid-cols-2 gap-4  px-4 py-2">
+                            <select 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                                    <option>Área de salud</option>
+                                    <option>Cirujano</option>
                             </select>
-                            <select className="input">
+                            <select 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                                 <option>Clínica</option>
                             </select>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 border border-gray-300 rounded px-4 py-2">
-                            <input type="text" placeholder="Edad" className="input" />
-                            <input type="text" placeholder="No." className="input" />
+                        <div className="grid grid-cols-2 gap-4 px-4 py-2">
+                            <input 
+                                type="text" 
+                                placeholder="Edad" 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                            <input 
+                                type="text" 
+                                placeholder="No." 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 border border-gray-300 rounded px-4 py-2">
-                            <input type="text" placeholder="Ciudad" className="input" />
-                            <input type="text" placeholder="Postal" className="input" />
+                        <div className="grid grid-cols-2 gap-4 rounded px-4 py-2">
+                            <input 
+                                type="text" 
+                                placeholder="Ciudad" 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                            <input 
+                                type="text" 
+                                placeholder="Postal" 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 border border-gray-300 rounded px-4 py-2">
-                            <input type="email" placeholder="E-Mail*" className="input" />
-                            <input type="text" placeholder="Telefono" className="input" />
+                        <div className="grid grid-cols-2 gap-4 px-4 py-2">
+                            <input 
+                                type="email" 
+                                placeholder="E-Mail*" 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                            <input 
+                                type="text" 
+                                placeholder="Telefono" 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
                         </div>
 
                          <div className="flex justify-center gap-6 pt-4">
@@ -70,33 +96,64 @@ export default function RegisterPage(){
 
                           <div className="flex items-center gap-6 text-white font-bold">
                               <label className="flex items-center gap-2">
-                                  <input type="radio" name="gender" value="F" className="accent-blue-500" />
+                                  <input 
+                                    type="radio" 
+                                    name="gender" value="F" 
+                                    className="accent-blue-500" />
                                   <span className="text-sm">F.</span>
                               </label>
                               <label className="flex items-center gap-2">
-                                  <input type="radio" name="gender" value="M" className="accent-blue-500" />
+                                  <input 
+                                    type="radio" 
+                                    name="gender" 
+                                    value="M" 
+                                    className="accent-blue-500" />
                                   <span className="text-sm">M.</span>
                               </label>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4 border border-white-300 rounded text-white px-4 py-2">
-                              <input type="text" placeholder="Nombre" className="input" />
-                              <input type="text" placeholder="Apellido" className="input"/>
+                          <div className="grid grid-cols-2 gap-4 text-white px-4 py-2">
+                              <input 
+                                type="text" 
+                                placeholder="Nombre" 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400" />
+                              <input 
+                                type="text" 
+                                placeholder="Apellido" 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400"/>
                           </div>
                           
-                          <div className="grid grid-cols-2 gap-4 border border-white-300 rounded text-white px-4 py-2">
-                              <input type="text" placeholder="Edad" className="input" />
-                              <input type="text" placeholder="No." className="input" />
+                          <div className="grid grid-cols-2 gap-4  text-white px-4 py-2">
+                              <input 
+                                type="text" 
+                                placeholder="Edad" 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400" />
+                              <input 
+                                type="text" 
+                                placeholder="No." 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400" />
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4 border border-white-300 rounded text-white px-4 py-2">
-                              <input type="text" placeholder="Ciudad" className="input" />
-                              <input type="text" placeholder="Postal" className="input" />
+                          <div className="grid grid-cols-2 gap-4 text-white px-4 py-2">
+                              <input 
+                                type="text" 
+                                placeholder="Ciudad" 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400" />
+                              <input 
+                                type="text" 
+                                placeholder="Postal" 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400" />
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4 border border-white-300 rounded text-white px-4 py-2">
-                              <input type="email" placeholder="E-Mail*" className="input" />
-                              <input type="text" placeholder="Telefono" className="input" />
+                          <div className="grid grid-cols-2 gap-4 text-white px-4 py-2">
+                              <input 
+                                type="email" 
+                                placeholder="E-Mail*" 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400" />
+                              <input 
+                                type="text" 
+                                placeholder="Telefono" 
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400" />
                           </div>
 
                           <div className="flex justify-center gap-6 pt-4 ">

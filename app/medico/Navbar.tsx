@@ -8,7 +8,7 @@ export default function NavbarMedico() {
   const router = useRouter();
 
   const handleConsultorioClick = () => {
-    router.push('/medico/consultorio');
+    router.push('/medico');
   };
 
   return (
@@ -19,7 +19,7 @@ export default function NavbarMedico() {
 
       <button
         onClick={handleConsultorioClick}
-        className={`font-semibold text-lg px-4 py-1 rounded transition-colors duration-300 text-blue-700`}
+        className={`font-semibold text-lg px-4 py-1 rounded transition-colors duration-300 text-blue-700 hover:bg-gray-50 cursor-pointer`}
       >
         Consultorio
       </button>
@@ -50,6 +50,12 @@ export default function NavbarMedico() {
               >
                 Cerrar sesión
               </div>
+               <div
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => ('')}
+              >
+                Agregar consultorio
+              </div>
             </div>
           )}
         </div>
@@ -78,7 +84,13 @@ export default function NavbarMedico() {
 
         {/* Iconos */}
         <img src="/icono_notificaciones.png" alt="Notificaciones" className="h-8" />
-        <img src="/icono_doctor.png" alt="Perfil Médico" className="h-8" />
+        
+        <img 
+        src="/icono_doctor.png" 
+        alt="Perfil Médico" 
+        className="h-8 cursor-pointer"
+        onClick={() => router.push('/medico/perfil')} 
+        />
       </div>
     </nav>
   );

@@ -3,8 +3,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import HeaderPaciente from "@/components/HeaderPaciente";
 import { FaCalendarAlt, FaClock, FaMapMarkerAlt } from "react-icons/fa";
+import NavbarPaciente from "../NavBar";
 
 // Simulación de citas guardadas
 const citasSimuladas = [
@@ -34,7 +34,7 @@ export default function CitasPage() {
 
   return (
     <main className="min-h-screen bg-gray-100">
-      <HeaderPaciente />
+      <NavbarPaciente />
       <section className="max-w-4xl mx-auto px-4 py-10">
         <h1 className="text-2xl font-bold mb-6">Mis citas agendadas</h1>
 
@@ -59,7 +59,7 @@ export default function CitasPage() {
                     <FaMapMarkerAlt className="text-blue-500" /> {cita.ubicacion}
                   </p>
                 </div>
-                <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm">
+                <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-2xl text-sm">
                   Cancelar cita
                 </button>
               </li>

@@ -1,20 +1,19 @@
-'use client';
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import NavbarPaciente from "./NavBar";
 
-import React from 'react';
-import NavbarMedico from './Navbar';
-import Image from 'next/image';
-import Link from 'next/link';
-
-export default function MedicoHomePage() {
+export default function PacienteDashboard() {
   return (
-    <div>
-      <NavbarMedico />
+    <main className="min-h-screen bg-white">
+      <NavbarPaciente />
+
       <section className="max-w-6xl mx-auto px-4 py-12">
-        {/* Card de clínica */}
         <div className="bg-blue-100 border border-blue-300 rounded-xl p-6 flex flex-col md:flex-row gap-6 items-center">
+          
           <div className="w-full md:w-1/2">
             <Image
-              src="/clinica1.jpeg"
+              src="/clinica1.jpeg" 
               alt="Clínica los Angeles"
               width={600}
               height={400}
@@ -35,28 +34,14 @@ export default function MedicoHomePage() {
               <li><span className="font-semibold text-blue-700">🕒 Horarios:</span> 8 a.m – 7 p.m</li>
             </ul>
 
-            <div className="flex-col gap-2 p-2 mt-12 text-right">
-              <Link href="/medico/consultorio">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 transition mr-4">
-                  Editar consultorio
-                </button>
-                 <button className="bg-red-600 text-white px-4 py-2 rounded-2xl hover:bg-red-700 transition">
-                  Eliminar consultorio
-                </button>
+            <div className="mt-4 text-right">
+              <Link href="/paciente/clinica">
+                <button className="bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 transition">Ver más</button>
               </Link>
             </div>
           </div>
         </div>
-
-        {/* Botón Agregar fuera de la card */}
-        <div className="flex justify-end mt-6">
-          <Link href="/medico/newConsultorio">
-            <button className="bg-green-600 text-white px-6 py-2 rounded-2xl shadow hover:bg-green-700 transition">
-              ➕ Agregar consultorio
-            </button>
-          </Link>
-        </div>
       </section>
-    </div>
+    </main>
   );
 }

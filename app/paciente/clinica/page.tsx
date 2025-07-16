@@ -50,6 +50,7 @@ export default function ClinicaDetalle() {
 
             <div className="mb-4">
               <p className="font-medium mb-1">Agregar tu comentario</p>
+              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reprehenderit neque laudantium, est voluptates doloribus, odit illo quam error, id vel impedit nam. Officia, eaque maxime doloribus sint praesentium similique rem!</p>
 
               <div className="flex items-center gap-1 mb-2">
                 {[...Array(5)].map((_, index) => {
@@ -123,7 +124,7 @@ export default function ClinicaDetalle() {
             </div>
 
             <button
-              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 w-full"
               onClick={agendarCita}
             >
               Agendar

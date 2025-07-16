@@ -1,14 +1,13 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import NavbarMedico from "../components/Navbar";
+import NavbarMedico from "../Navbar";
 import { FaStar } from "react-icons/fa";
 
 // MUI
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -28,7 +27,7 @@ export default function Consultorio() {
   return (
     <>
       <NavbarMedico />
-      <div className="p-8 bg-white text-gray-800 max-w-6xl mx-auto">
+      <div className="p-8 mt-20 bg-white text-gray-800 max-w-6xl mx-auto ">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* LADO IZQUIERDO */}
           <div>
@@ -57,14 +56,33 @@ export default function Consultorio() {
           {/* LADO DERECHO */}
           <div className="space-y-4">
             <div>
-              <p className="text-sm font-semibold">Descripción:</p>
-              <p className="text-sm">Clínica especializada en procedimientos visuales.</p>
-            </div>
+    <label className="block text-sm font-semibold mb-1" htmlFor="descripcion">
+      Descripción:
+    </label>
+    <textarea
+      id="descripcion"
+      name="descripcion"
+      rows={3}
+      className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+      placeholder="Escribe una breve descripción del consultorio..."
+      defaultValue="Clínica especializada en procedimientos visuales."
+    />
+  </div>
 
-            <div>
-              <p className="text-sm font-semibold">Ubicación:</p>
-              <p className="text-sm">Apizaco, Tlaxcala</p>
-            </div>
+  {/* Ubicación */}
+  <div>
+    <label className="block text-sm font-semibold mb-1" htmlFor="ubicacion">
+      Ubicación:
+    </label>
+    <input
+      id="ubicacion"
+      name="ubicacion"
+      type="text"
+      className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+      placeholder="Ciudad, Estado"
+      defaultValue="Apizaco, Tlaxcala"
+    />
+  </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Doctor responsable:</label>
@@ -78,30 +96,40 @@ export default function Consultorio() {
               </select>
             </div>
 
-            {/* Pickers */}
+            {/* Pickers actualizados */}
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <DateTimePicker
                   label="Inicio de atención"
                   value={inicio}
-                  onChange={setInicio}
-                  renderInput={(params) => <TextField {...params} />}
+                  onChange={(newValue) => setInicio(newValue)}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      helperText: null,
+                    },
+                  }}
                 />
                 <DateTimePicker
                   label="Fin de atención"
                   value={fin}
-                  onChange={setFin}
-                  renderInput={(params) => <TextField {...params} />}
+                  onChange={(newValue) => setFin(newValue)}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      helperText: null,
+                    },
+                  }}
                 />
               </Box>
             </LocalizationProvider>
 
+            
             <button
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md mt-4"
-              disabled={!inicio || !fin}
-              onClick={handleGuardarHorario}
+              className="bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700 transition"
+              onClick={()=> ('/medico/')}
             >
-              Guardar horario de atención
+              Guardar
             </button>
           </div>
         </div>
