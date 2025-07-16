@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import NavbarMedico from "../Navbar";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaEdit } from "react-icons/fa";
 
 // MUI
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -10,11 +10,13 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import Box from "@mui/material/Box";
 import dayjs, { Dayjs } from "dayjs";
+import { useRouter } from "next/navigation";
 
 export default function Consultorio() {
   const [selectedDoctor, setSelectedDoctor] = useState("Dra. Gómez");
   const [inicio, setInicio] = useState<Dayjs | null>(dayjs());
   const [fin, setFin] = useState<Dayjs | null>(dayjs().add(1, "hour"));
+  const router = useRouter();
 
   const handleGuardarHorario = () => {
     if (!inicio || !fin) return;
@@ -22,12 +24,14 @@ export default function Consultorio() {
     alert(
       `🕒 Horario de atención registrado:\nDoctor: ${selectedDoctor}\nInicio: ${inicio.format("DD/MM/YYYY hh:mm A")}\nFin: ${fin.format("DD/MM/YYYY hh:mm A")}`
     );
+
+    router.push("/medico");
   };
 
   return (
     <>
       <NavbarMedico />
-      <div className="p-8 mt-20 bg-white text-gray-800 max-w-6xl mx-auto ">
+      <div className="p-8 mt-20 bg-white text-gray-800 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* LADO IZQUIERDO */}
           <div>
@@ -55,35 +59,47 @@ export default function Consultorio() {
 
           {/* LADO DERECHO */}
           <div className="space-y-4">
+            {/* Descripción con botón Editar */}
             <div>
-    <label className="block text-sm font-semibold mb-1" htmlFor="descripcion">
-      Descripción:
-    </label>
-    <textarea
-      id="descripcion"
-      name="descripcion"
-      rows={3}
-      className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-      placeholder="Escribe una breve descripción del consultorio..."
-      defaultValue="Clínica especializada en procedimientos visuales."
-    />
-  </div>
+              <div className="flex items-center justify-between mb-1">
+                <label htmlFor="descripcion" className="text-sm font-semibold">
+                  Descripción:
+                </label>
+                <button
+                  type="button"
+                  className="flex items-center text-blue-600 text-sm hover:underline"
+                  onClick={() => router.push("/medico/editar")}
+                >
+                  <FaEdit className="mr-1" />
+                  Editar
+                </button>
+              </div>
+              <textarea
+                id="descripcion"
+                name="descripcion"
+                rows={3}
+                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Escribe una breve descripción del consultorio..."
+                defaultValue="Clínica especializada en procedimientos visuales."
+              />
+            </div>
 
-  {/* Ubicación */}
-  <div>
-    <label className="block text-sm font-semibold mb-1" htmlFor="ubicacion">
-      Ubicación:
-    </label>
-    <input
-      id="ubicacion"
-      name="ubicacion"
-      type="text"
-      className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-      placeholder="Ciudad, Estado"
-      defaultValue="Apizaco, Tlaxcala"
-    />
-  </div>
+            {/* Ubicación */}
+            <div>
+              <label className="block text-sm font-semibold mb-1" htmlFor="ubicacion">
+                Ubicación:
+              </label>
+              <input
+                id="ubicacion"
+                name="ubicacion"
+                type="text"
+                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Ciudad, Estado"
+                defaultValue="Apizaco, Tlaxcala"
+              />
+            </div>
 
+            {/* Doctor responsable */}
             <div>
               <label className="block text-sm font-medium mb-1">Doctor responsable:</label>
               <select
@@ -96,7 +112,7 @@ export default function Consultorio() {
               </select>
             </div>
 
-            {/* Pickers actualizados */}
+            {/* Pickers de fecha y hora */}
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <DateTimePicker
@@ -124,10 +140,10 @@ export default function Consultorio() {
               </Box>
             </LocalizationProvider>
 
-            
+            {/* Botón Guardar */}
             <button
               className="bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700 transition"
-              onClick={()=> ('/medico/')}
+              onClick={handleGuardarHorario}
             >
               Guardar
             </button>
