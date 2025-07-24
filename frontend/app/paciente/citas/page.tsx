@@ -3,34 +3,66 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { FaCalendarAlt, FaClock, FaMapMarkerAlt } from "react-icons/fa";
+import { FaCalendarAlt, FaClock, FaLocationArrow, FaPlaceOfWorship, FaUser } from "react-icons/fa";
 import NavbarPaciente from "../NavBar";
 
-// Simulación de citas guardadas
-const citasSimuladas = [
-  {
-    id: 1,
-    clinica: "Clínica Los Angeles",
-    fecha: "2025-07-05",
-    hora: "10:30 a.m",
-    ubicacion: "Tlaxcala",
-  },
-  {
-    id: 2,
-    clinica: "Centro Médico San José",
-    fecha: "2025-07-10",
-    hora: "9:00 a.m",
-    ubicacion: "Apizaco",
-  },
-];
+type Cita = {
+  id: number;
+  estado: string;
+  clinica: string;
+  medico: string;
+  fecha: string;
+  hora: string;
+  ubicacion: string;
+};
 
 export default function CitasPage() {
-  const [citas, setCitas] = useState<typeof citasSimuladas>([]);
+  const [citas, setCitas] = useState<Cita[]>([]);
 
   useEffect(() => {
-    // Aquí iría la consulta real a Firebase o tu API
-    setCitas(citasSimuladas);
+    fetch("http://127.0.0.1:8000/api/citas/",)
+      .then(res => {
+        console.log("RES STATUS:", res.status);
+        if (!res.ok) {
+          throw new Error("Error al obtener las citas");
+        }
+        return res.json();
+    })
+      .then((data: Cita[]) => setCitas(data))
+      .catch(error => console.error("Error:", error));
   }, []);
+
+  const handleCancelarCita = (id: number) => {
+  setCitas((prev) => prev.filter((cita) => cita.id !== id));
+};
+
+const cancelarCita = async (id: number) => {
+  const confirmacion = confirm("¿Estás seguro de que quieres cancelar esta cita?");
+  if(!confirmacion) return;
+
+  try {
+    console.log("Eliminando cita con ID:", id);
+    const response = await fetch(`http://127.0.0.1:8000/api/citas/${id}/cancelar/`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Error al cancelar la cita');
+    }
+    const data = await response.json();
+    alert(data.mensaje);
+    setCitas((prev) =>
+      prev.map((cita) =>
+        cita.id === id ? { ...cita, estado: "Cancelada" } : cita
+      )
+    );
+  } catch (error) {
+    console.error(error);
+    alert("Ocurrió un error al cancelar la cita");
+  }
+}
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -48,18 +80,28 @@ export default function CitasPage() {
                 className="bg-white rounded-xl shadow-md p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
               >
                 <div>
-                  <h2 className="text-lg font-semibold">{cita.clinica}</h2>
-                  <p className="flex items-center gap-2 text-sm text-gray-700 mt-1">
-                    <FaCalendarAlt className="text-blue-500" /> {new Date(cita.fecha).toLocaleDateString()}
+                  <h2 className="text-lg font-semibold">{cita.estado}</h2>
+
+                  <p className="flex items-center gap-2 text-sm text-gray-700">
+                    <FaPlaceOfWorship className="text-blue-500" /> {cita.clinica}
+                  </p>
+                  <p className="flex items-center gap-2 text-sm text-gray-700">
+                    <FaUser className="text-blue-500" /> {cita.medico}
+                  </p>
+                  <p className="flex items-center gap-2 text-sm text-gray-700">
+                    <FaCalendarAlt className="text-blue-500" /> {cita.fecha}
                   </p>
                   <p className="flex items-center gap-2 text-sm text-gray-700">
                     <FaClock className="text-blue-500" /> {cita.hora}
                   </p>
                   <p className="flex items-center gap-2 text-sm text-gray-700">
-                    <FaMapMarkerAlt className="text-blue-500" /> {cita.ubicacion}
+                    <FaLocationArrow className="text-blue-500" /> {cita.ubicacion}
                   </p>
                 </div>
-                <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-2xl text-sm">
+                <button
+                  onClick={() => cancelarCita(cita.id)}
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-2xl text-sm"
+                >
                   Cancelar cita
                 </button>
               </li>
