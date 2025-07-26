@@ -9,8 +9,8 @@ import NavbarPaciente from "../NavBar";
 type Cita = {
   id: number;
   estado: string;
-  clinica: string;
-  medico: string;
+  clinica_nombre: string;
+  medico_nombre: string;
   fecha: string;
   hora: string;
   ubicacion: string;
@@ -83,10 +83,10 @@ const cancelarCita = async (id: number) => {
                   <h2 className="text-lg font-semibold">{cita.estado}</h2>
 
                   <p className="flex items-center gap-2 text-sm text-gray-700">
-                    <FaPlaceOfWorship className="text-blue-500" /> {cita.clinica}
+                    <FaPlaceOfWorship className="text-blue-500" /> {cita.clinica_nombre}
                   </p>
                   <p className="flex items-center gap-2 text-sm text-gray-700">
-                    <FaUser className="text-blue-500" /> {cita.medico}
+                    <FaUser className="text-blue-500" /> {cita.medico_nombre}
                   </p>
                   <p className="flex items-center gap-2 text-sm text-gray-700">
                     <FaCalendarAlt className="text-blue-500" /> {cita.fecha}
@@ -98,12 +98,14 @@ const cancelarCita = async (id: number) => {
                     <FaLocationArrow className="text-blue-500" /> {cita.ubicacion}
                   </p>
                 </div>
-                <button
-                  onClick={() => cancelarCita(cita.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-2xl text-sm"
-                >
-                  Cancelar cita
-                </button>
+                {cita.estado.toLowerCase() !== "cancelada" && (
+                  <button
+                    onClick={() => cancelarCita(cita.id)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-2xl text-sm"
+                  >
+                    Cancelar cita
+                  </button>
+                )}
               </li>
             ))}
           </ul>

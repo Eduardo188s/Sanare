@@ -9,11 +9,11 @@ type Clinica = {
   id: number;
   nombre: string;
   descripcion: string;
-  direccion: string;
-  horarios: string;
+  hora_apertura: string;
+  hora_cierre: string;
   ubicacion: string;
-  especialidad: string;
   especialidades: string[];
+  imagen: string;
 };
 
 export default function PacienteDashboard() {
@@ -35,13 +35,18 @@ export default function PacienteDashboard() {
         <div key={clinica.id} className="bg-blue-100 border border-blue-300 rounded-xl p-6 flex flex-col md:flex-row gap-6 items-center">
           
           <div className="w-full md:w-1/2">
+          {clinica.imagen ? (
             <Image
-              src="/clinica1.jpeg" 
+              src={clinica.imagen}
               alt={clinica.nombre}
               width={600}
               height={400}
               className="rounded-lg object-cover"
             />
+          ) : (
+            <p>Sin imagen disponible</p>
+          )}
+            
           </div>
 
           <div className="w-full md:w-1/2 text-gray-800">
@@ -51,9 +56,9 @@ export default function PacienteDashboard() {
             </p>
 
             <ul className="space-y-2 text-sm">
-              <li><span className="font-semibold text-blue-700">📋 Especializada en:</span> {clinica.especialidades.join(', ')}</li>
+              <li><span className="font-semibold text-blue-700">📋 Especializada en:</span> {clinica.especialidades?.length > 0 ? clinica.especialidades.join(', ') : "No especificado"}</li>
               <li><span className="font-semibold text-blue-700">📍 Ubicada en:</span> {clinica.ubicacion}</li>
-              <li><span className="font-semibold text-blue-700">🕒 Horarios:</span> {clinica.horarios}</li>
+              <li><span className="font-semibold text-blue-700">🕒 Horarios:</span> {" "}{clinica.hora_apertura && clinica.hora_cierre? `${clinica.hora_apertura} - ${clinica.hora_cierre}` : "No especificado"}</li>
             </ul>
 
             <div className="mt-4 text-right">
