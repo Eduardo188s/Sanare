@@ -5,20 +5,24 @@ import Image from "next/image";
 import NavbarMedico from "../Navbar";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import Box from "@mui/material/Box";
 import dayjs, { Dayjs } from "dayjs";
 import { FaCamera } from "react-icons/fa";
 
 export default function NewConsultorio() {
-  const [selectedDoctor, setSelectedDoctor] = useState("Dra. Gómez");
+  const [nombre, setNombre] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [ubicacion, setUbicacion] = useState("");
   const [inicio, setInicio] = useState<Dayjs | null>(dayjs());
   const [fin, setFin] = useState<Dayjs | null>(dayjs().add(1, "hour"));
   const [imagenPreview, setImagenPreview] = useState<string>("/clinica1.jpeg");
+  const [imagenFile, setImagenFile] = useState<File | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setImagenFile(file);
       const reader = new FileReader();
       reader.onload = () => {
         if (reader.result) {
@@ -29,10 +33,36 @@ export default function NewConsultorio() {
     }
   };
 
-  const handleGuardarConsultorio = () => {
-    alert("✅ Consultorio registrado correctamente (simulado)");
-    
-  };
+  const handleGuardarConsultorio = async () => {
+
+    const formData = new FormData();
+    formData.append("nombre", nombre);
+    formData.append("descripcion", descripcion);
+    formData.append("ubicacion", ubicacion);
+    formData.append("hora_apertura", inicio?.format("HH:mm") || "08:00");
+    formData.append("hora_cierre", fin?.format("HH:mm") || "17:00");
+    if (imagenFile) {
+      formData.append("imagen", imagenFile);
+  }
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/clinicas/", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (response.ok) {
+      alert("Consultorio registrado correctamente");
+    } else {
+      const errorText = await response.text();
+      console.error("Error al registrar consultorio:", errorText);
+      alert("Error al registrar consultorio");
+    }
+  } catch (error) {
+    console.error("Error de red:", error);
+    alert("Error de red al registrar consultorio");
+  }
+};
 
   return (
      <main className="min-h-screen bg-white">
@@ -65,17 +95,34 @@ export default function NewConsultorio() {
             {/* Formulario */}
             <div className="space-y-4">
                 <div>
+                <label className="block text-sm font-semibold mb-1" htmlFor="nombre">
+                  Nombre de la clínica:
+                </label>
+                  <input
+                    id="nombre"
+                    name="nombre"
+                    type="text"
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    placeholder="Ejemplo: Clínica Los Ángeles"
+                  />
+                </div>
+
+                <div>
                 <label className="block text-sm font-semibold mb-1" htmlFor="descripcion">
-                    Descripción:
+                  Descripción:
                 </label>
                 <textarea
-                    id="descripcion"
-                    name="descripcion"
-                    rows={3}
-                    className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    placeholder="Escribe una breve descripción del consultorio..."
+                  id="descripcion"
+                  name="descripcion"
+                  rows={3}
+                  value={descripcion}
+                  onChange={(e) => setDescripcion(e.target.value)}
+                  className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  placeholder="Escribe una breve descripción del consultorio..."
                 />
-                </div>
+              </div>
 
                 <div>
                 <label className="block text-sm font-semibold mb-1" htmlFor="ubicacion">
@@ -84,49 +131,32 @@ export default function NewConsultorio() {
                 <input
                     id="ubicacion"
                     name="ubicacion"
-                    type="text"
+                    value={ubicacion}
+                    onChange={(e) => setUbicacion(e.target.value)}
                     className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                     placeholder="Ciudad, Estado"
                 />
                 </div>
 
-                <div>
-                <label className="block text-sm font-medium mb-1">Doctor responsable:</label>
-                <select
-                    aria-placeholder="Doctor responsable"
-                    className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    value={selectedDoctor}
-                    onChange={(e) => setSelectedDoctor(e.target.value)}
-                >
-                    <option>Dra. Gómez</option>
-                    <option>Dr. Ramírez</option>
-                    <option>Dr. Ortega</option>
-                </select>
-                </div>
+                {/* Doctor responsable */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Médico responsable:</label>
+                <p className="text-gray-700 font-semibold">
+                  (Se asignará automáticamente al usuario actual)
+                </p>
+              </div>
 
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                    <DateTimePicker
-                    label="Inicio de atención"
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    <TimePicker
+                    label="Hora de apertura"
                     value={inicio}
                     onChange={(newValue) => setInicio(newValue)}
-                    slotProps={{
-                        textField: {
-                        fullWidth: true,
-                        helperText: null,
-                        },
-                    }}
                     />
-                    <DateTimePicker
-                    label="Fin de atención"
-                    value={fin}
-                    onChange={(newValue) => setFin(newValue)}
-                    slotProps={{
-                        textField: {
-                        fullWidth: true,
-                        helperText: null,
-                        },
-                    }}
+                    <TimePicker
+                      label="Hora de cierre"
+                      value={fin}
+                      onChange={(newValue) => setFin(newValue)}
                     />
                 </Box>
                 </LocalizationProvider>

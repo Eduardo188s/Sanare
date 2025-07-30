@@ -5,6 +5,17 @@ import Image from "next/image";
 import Link from "next/link";
 import NavbarPaciente from "./NavBar";
 
+type Especialidad = {
+  id: number;
+  nombre: string;
+};
+
+type Medico = {
+  id: number;
+  nombre: string;
+  especialidad: Especialidad | null;
+};
+
 type Clinica = {
   id: number;
   nombre: string;
@@ -12,8 +23,9 @@ type Clinica = {
   hora_apertura: string;
   hora_cierre: string;
   ubicacion: string;
-  especialidades: string[];
+  especialidad: string[];
   imagen: string;
+  medico_responsable: Medico | null;
 };
 
 export default function PacienteDashboard() {
@@ -22,7 +34,7 @@ export default function PacienteDashboard() {
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/clinicas/")
       .then((res) => res.json())
-      .then((data) => setClinicas(data))
+      .then((data) => setClinicas(data))  
       .catch((error) => console.error("Error al cargar clínicas:", error));
   }, []);
 
@@ -33,7 +45,6 @@ export default function PacienteDashboard() {
       <section className="max-w-6xl mx-auto px-4 py-12">
         {clinicas.map((clinica) => (
         <div key={clinica.id} className="bg-blue-100 border border-blue-300 rounded-xl p-6 flex flex-col md:flex-row gap-6 items-center">
-          
           <div className="w-full md:w-1/2">
           {clinica.imagen ? (
             <Image
@@ -56,7 +67,8 @@ export default function PacienteDashboard() {
             </p>
 
             <ul className="space-y-2 text-sm">
-              <li><span className="font-semibold text-blue-700">📋 Especializada en:</span> {clinica.especialidades?.length > 0 ? clinica.especialidades.join(', ') : "No especificado"}</li>
+              <li><span className="font-semibold text-blue-700">📋 Especialidad: </span> {clinica.medico_responsable?.especialidad?.nombre || "No especificada"} </li>
+              <li><span className="font-semibold text-blue-700">👨‍⚕️ Médico responsable: </span>{" "}{clinica.medico_responsable?.nombre || "No especificado"} </li>
               <li><span className="font-semibold text-blue-700">📍 Ubicada en:</span> {clinica.ubicacion}</li>
               <li><span className="font-semibold text-blue-700">🕒 Horarios:</span> {" "}{clinica.hora_apertura && clinica.hora_cierre? `${clinica.hora_apertura} - ${clinica.hora_cierre}` : "No especificado"}</li>
             </ul>

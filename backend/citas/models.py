@@ -15,6 +15,13 @@ class Clinica(models.Model):
     hora_apertura = models.TimeField(null=True, blank=True)
     hora_cierre = models.TimeField(null=True, blank=True)
     imagen = models.ImageField(upload_to='clinicas/', null=True, blank=True)
+    medico_responsable = models.ForeignKey(
+        "Medico",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="clinicas"
+    )
 
     def clean(self):
         if self.hora_apertura and self.hora_cierre:

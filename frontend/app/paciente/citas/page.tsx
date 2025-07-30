@@ -3,7 +3,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { FaCalendarAlt, FaClock, FaLocationArrow, FaPlaceOfWorship, FaUser } from "react-icons/fa";
+import { FaCalendarAlt, FaClock, FaCommentDots, FaLocationArrow, FaPlaceOfWorship, FaUser } from "react-icons/fa";
 import NavbarPaciente from "../NavBar";
 
 type Cita = {
@@ -14,6 +14,7 @@ type Cita = {
   fecha: string;
   hora: string;
   ubicacion: string;
+  motivo?: string | null;
 };
 
 export default function CitasPage() {
@@ -33,7 +34,7 @@ export default function CitasPage() {
   }, []);
 
   const handleCancelarCita = (id: number) => {
-  setCitas((prev) => prev.filter((cita) => cita.id !== id));
+    setCitas((prev) => prev.filter((cita) => cita.id !== id));
 };
 
 const cancelarCita = async (id: number) => {
@@ -83,10 +84,12 @@ const cancelarCita = async (id: number) => {
                   <h2 className="text-lg font-semibold">{cita.estado}</h2>
 
                   <p className="flex items-center gap-2 text-sm text-gray-700">
-                    <FaPlaceOfWorship className="text-blue-500" /> {cita.clinica_nombre}
+                    <FaPlaceOfWorship className="text-blue-500" /> {" "}
+                    {cita.clinica_nombre}
                   </p>
                   <p className="flex items-center gap-2 text-sm text-gray-700">
-                    <FaUser className="text-blue-500" /> {cita.medico_nombre}
+                    <FaUser className="text-blue-500" /> {" "}
+                    {cita.medico_nombre}
                   </p>
                   <p className="flex items-center gap-2 text-sm text-gray-700">
                     <FaCalendarAlt className="text-blue-500" /> {cita.fecha}
@@ -95,7 +98,14 @@ const cancelarCita = async (id: number) => {
                     <FaClock className="text-blue-500" /> {cita.hora}
                   </p>
                   <p className="flex items-center gap-2 text-sm text-gray-700">
-                    <FaLocationArrow className="text-blue-500" /> {cita.ubicacion}
+                    <FaLocationArrow className="text-blue-500" /> {" "}
+                    {cita.ubicacion}
+                    </p>
+                  <p className="flex items-center gap-2 text-sm text-gray-700">
+                    <FaCommentDots className="text-blue-500" />{" "}
+                    {cita.motivo && cita.motivo.trim() !== ""
+                      ? cita.motivo
+                      : "Sin motivo especificado"}
                   </p>
                 </div>
                 {cita.estado.toLowerCase() !== "cancelada" && (

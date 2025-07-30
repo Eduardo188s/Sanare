@@ -8,29 +8,18 @@ class EspecialidadSerializer(serializers.ModelSerializer):
         fields = ['id', 'nombre']
 
 class MedicoSerializer(serializers.ModelSerializer):
-    especialidad = serializers.PrimaryKeyRelatedField(queryset=Especialidad.objects.all())
-    clinica = serializers.PrimaryKeyRelatedField(queryset=Clinica.objects.all())
-
+    especialidad = EspecialidadSerializer(read_only=True)
+    
     class Meta:
         model = Medico
-        fields = '__all__'
+        fields = ['id', 'nombre', 'especialidad']
 
 class ClinicaSerializer(serializers.ModelSerializer):
-    medicos = MedicoSerializer(many=True, read_only=True)
-    especialidades = serializers.SerializerMethodField()
+    medico_responsable = MedicoSerializer(read_only=True)
 
     class Meta:
         model = Clinica
-        fields = '__all__'
-
-    def get_horarios(self, obj):
-        if obj.hora_apertura and obj.hora_cierre:
-            return [f"{obj.hora_apertura.strftime('%H:%M')} - {obj.hora_cierre.strftime('%H:%M')}"]
-        return ["No especificado"]
-        
-    def get_especialidades(self, obj):
-        especialidades = obj.medicos.values_list('especialidad__nombre', flat=True).distinct()
-        return list(especialidades)
+        fields = ['id', 'nombre', 'descripcion', 'imagen', 'ubicacion', 'hora_apertura', 'hora_cierre', 'medico_responsable']
 
 class HorarioSerializer(serializers.ModelSerializer):
     medico = serializers.PrimaryKeyRelatedField(queryset=Medico.objects.all())

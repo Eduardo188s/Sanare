@@ -11,6 +11,17 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import dayjs, { Dayjs } from 'dayjs';
 
+type Especialidad = {
+  id: number;
+  nombre: string;
+};
+
+type Medico = {
+  id: number;
+  nombre: string;
+  especialidad: Especialidad;
+};
+
 type Clinica = {
   id: number;
   nombre: string;
@@ -19,6 +30,7 @@ type Clinica = {
   ubicacion: string;
   hora_apertura: string;
   hora_cierre: string;
+  medico_responsable: Medico | null;
 };
 
 export default function ClinicaDetalle() {
@@ -32,55 +44,55 @@ export default function ClinicaDetalle() {
   const [selectedHour, setSelectedHour] = useState<string>('');
   const [rating, setRating] = useState<number | null>(5);
   const [hover, setHover] = useState<number | null>(null);
+  const [motivo, setMotivo] = useState('');
 
-  const pacienteId = typeof window !== 'undefined' ? Number(localStorage.getItem('pacienteId')) : null;
-  const [medicoId, setMedicoId] = useState<number | null>(null);
-
-
-  useEffect(() => {
-  if (!clinicaId) return;
-
-  fetch(`http://127.0.0.1:8000/api/medicos/?clinica=${clinicaId}`)
-    .then(res => res.json())
-    .then(data => {
-      if (data.length > 0) {
-        setMedicoId(data[0].id);
-      } else {
-        setMedicoId(null);
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      setMedicoId(null);
-    });
-  }, [clinicaId]);
+  const pacienteId =
+    typeof window !== 'undefined'
+      ? Number(localStorage.getItem('pacienteId'))
+      : null;
 
   useEffect(() => {
     if (!clinicaId) return;
 
     fetch(`http://127.0.0.1:8000/api/clinicas/${clinicaId}/`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setClinica(data);
-        if (data.hora_apertura && data.hora_cierre) {
-          generarHorarios(data.hora_apertura, data.hora_cierre);
-        }
       })
-      .catch(err => console.error('Error al cargar la clínica:', err));
-    }, [clinicaId]);
+      .catch((err) => console.error('Error al cargar la clínica:', err));
+  }, [clinicaId]);
 
-    const generarHorarios = (inicio: string, fin: string) => {
-      const listaHorarios: string[] = [];
-      let actual = dayjs(`2000-01-01T${inicio}`);
-      const finHora = dayjs(`2000-01-01T${fin}`);
-
-      while (actual.isBefore(finHora)) {
-        listaHorarios.push(actual.format('HH:mm'));
-        actual = actual.add(30, 'minute');
-      }
-
-      setHorarios(listaHorarios);
+  const filtrarHorariosPorRango = (horas: string[], apertura: string, cierre: string): string[] => {
+    const convertirAMinutos = (hora: string) => {
+      const [h, m] = hora.split(':').map(Number);
+      return h * 60 + m;
     };
+
+    const aperturaMin = convertirAMinutos(apertura);
+    const cierreMin = convertirAMinutos(cierre);
+
+    return horas.filter((hora) => {
+      const horaMin = convertirAMinutos(hora);
+      return horaMin >= aperturaMin && horaMin < cierreMin;
+    });
+  };
+
+  // Carga horarios disponibles cuando cambian la fecha o la clínica (medico fijo)
+  useEffect(() => {
+    if (!selectedDate || !clinica?.medico_responsable) return;
+
+    const fecha = selectedDate.format('YYYY-MM-DD');
+    const medicoId = clinica.medico_responsable.id;
+
+    fetch(`http://127.0.0.1:8000/api/horarios-disponibles/${medicoId}/?fecha=${fecha}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const horas = data.map((h: any) => h.hora.slice(0, 5));
+        const horariosFiltrados = filtrarHorariosPorRango(horas, clinica.hora_apertura, clinica.hora_cierre);
+        setHorarios(horariosFiltrados);
+      })
+      .catch((err) => console.error('Error cargando horarios disponibles:', err));
+  }, [selectedDate, clinica]);
 
   const agendarCita = async () => {
     if (!selectedDate || !selectedHour) {
@@ -88,24 +100,23 @@ export default function ClinicaDetalle() {
       return;
     }
 
-    if (!medicoId) {
-    alert('Esta clínica no tiene médicos registrados. No puedes agendar una cita.');
-    return;
-  }
-
     const ahora = dayjs();
-    const fechaSeleccionada = selectedDate.hour(
-      Number(selectedHour.split(':')[0])
-    ).minute(Number(selectedHour.split(':')[1]));
+    const fechaSeleccionada = selectedDate
+      .hour(Number(selectedHour.split(':')[0]))
+      .minute(Number(selectedHour.split(':')[1]));
 
     if (fechaSeleccionada.isBefore(ahora)) {
       alert('Selecciona una fecha y hora válidas');
       return;
     }
 
+    if (!clinica?.medico_responsable) {
+      alert('No hay médico asignado a esta clínica.');
+      return;
+    }
+
     const tempPacienteId = pacienteId || 1;
     const tempClinicaId = clinicaId || 1;
-    const tempMedicoId = medicoId || 1;
 
     try {
       const response = await fetch('http://127.0.0.1:8000/api/citas/', {
@@ -114,15 +125,14 @@ export default function ClinicaDetalle() {
         body: JSON.stringify({
           paciente: tempPacienteId,
           clinica: tempClinicaId,
-          medico: tempMedicoId,
+          medico: clinica.medico_responsable.id,
           fecha: selectedDate.format('YYYY-MM-DD'),
           hora: selectedHour,
-          motivo: 'Consulta general',
+          motivo: motivo || 'Consulta general',
         }),
       });
 
-          console.log("Status:", response.status);
-
+      console.log('Status:', response.status);
 
       if (response.ok) {
         alert('Cita agendada correctamente');
@@ -130,10 +140,10 @@ export default function ClinicaDetalle() {
       } else {
         let errorText;
         try {
-        errorText = await response.text();
-      } catch {
-        errorText = "Sin mensaje de error";
-      }
+          errorText = await response.text();
+        } catch {
+          errorText = 'Sin mensaje de error';
+        }
         console.error('Error al agendar cita:', errorText);
         alert('Error al agendar cita');
       }
@@ -152,10 +162,10 @@ export default function ClinicaDetalle() {
       <section className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-10">
         {/* Imagen y Calificación */}
         <div className="flex flex-col items-start">
-          {clinica?.imagen ? (
+          {clinica.imagen ? (
             <Image
               src={clinica.imagen}
-              alt={clinica?.nombre || 'Clinica'}
+              alt={clinica.nombre || 'Clinica'}
               width={600}
               height={400}
               className="rounded-lg object-cover mb-6"
@@ -211,21 +221,37 @@ export default function ClinicaDetalle() {
 
         {/* Calendario y disponibilidad */}
         <div className="flex flex-col gap-4 text-gray-800">
-          <h2 className="text-2xl font-bold">
-            {clinica?.nombre || 'Clínica'}
-          </h2>
+          <h2 className="text-2xl font-bold">{clinica.nombre}</h2>
           <p>
-            <strong>Descripción:</strong>{' '}
-            {clinica?.descripcion || 'Sin descripción'}
+            <strong>Descripción:</strong> {clinica.descripcion || 'Sin descripción'}
           </p>
           <p>
-            <strong>Ubicación:</strong> {clinica?.ubicacion || 'No especificada'}
+            <strong>Ubicación:</strong> {clinica.ubicacion || 'No especificada'}
+          </p>
+          <p>
+            <strong>Especialidad:</strong>{' '}
+            {clinica.medico_responsable?.especialidad.nombre || 'No especificada'}
+          </p>
+          <p>
+            <strong>Médico responsable:</strong>{' '}
+            {clinica.medico_responsable?.nombre || 'No especificado'}
           </p>
 
-          <p className="text-blue-700 font-medium">Selecciona una fecha:</p>
+          {/* Motivo de la cita */}
+          <div className="mt-4">
+            <p className="font-medium text-sm mb-2">Motivo de la cita:</p>
+            <textarea
+              className="border px-2 py-1 rounded text-sm w-full"
+              rows={2}
+              value={motivo}
+              onChange={(e) => setMotivo(e.target.value)}
+              placeholder="Escribe el motivo..."
+            />
+          </div>
+
+          <p className="text-blue-700 font-medium mt-4">Selecciona una fecha:</p>
 
           <div className="border rounded-md p-4">
-            {/* MUI Calendar */}
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateCalendar value={selectedDate} onChange={setSelectedDate} />
             </LocalizationProvider>
