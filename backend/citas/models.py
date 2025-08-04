@@ -1,6 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.forms import ValidationError
+
+User = get_user_model()
 
 class Especialidad(models.Model):
     nombre = models.CharField(max_length=100)
@@ -35,9 +37,10 @@ class Medico(models.Model):
     nombre = models.CharField(max_length=200)
     especialidad = models.ForeignKey(Especialidad, on_delete=models.CASCADE, related_name='medicos')
     clinica = models.ForeignKey(Clinica, on_delete=models.CASCADE, related_name='medicos')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='medico_profile', null=True, blank=True)
 
     def __str__(self):
-        return f"{self.nombre} - {self.especialidad}"
+        return f"{self.user.username if self.user else self.nombre} - {self.especialidad}"
 
 class Horario(models.Model):
     medico = models.ForeignKey(Medico, on_delete=models.CASCADE)
