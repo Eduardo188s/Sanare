@@ -1,101 +1,123 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import NavbarMedico from './Navbar';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+
+import NavbarMedico from './Navbar';
+import axios from 'axios';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 
-type Clinica = {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  ubicacion: string;
-  hora_apertura: string;
-  hora_cierre: string;
-  imagen?: string;
-};
+interface Consultorio {
+    id: number;
+    nombre: string;
+    descripcion: string;
+    imagen: string;
+    ubicacion: string;
+}
 
-export default function MedicoHomePage() {
-  const [clinica, setClinica] = useState<Clinica | null>(null);
-  const medicoId = typeof window !== 'undefined' ? localStorage.getItem('medicoId') : null;
+export default function MedicoDashboard() {
+    const { user, loading } = useAuth();
+    const router = useRouter();
+    const [consultorios, setConsultorios] = useState<Consultorio[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
 
-  useEffect(() => {
-  if (!medicoId) return;
+    useEffect(() => {
+        if (!loading && (!user || !user.is_medico)) {
+            router.push('/login');
+            return;
+        }
 
-  fetch(`http://127.0.0.1:8000/api/clinicas/?medico=${medicoId}`)
-    .then(async (res) => {
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`HTTP ${res.status}: ${text}`);
-      }
-      return res.json();
-    })
-    .then(data => {
-      if (data.length > 0) setClinica(data[0]);
-    })
-    .catch(err => console.error('Error al cargar la clínica:', err));
-}, [medicoId]);
-  
-  return (
-    <main className='min-h-screen bg-white'>
-      <NavbarMedico />
-      <section className="max-w-6xl mx-auto px-4 py-12 bg-white">
-        {clinica ? (
-          <>
-            {/* Card de clínica */}
-            <div className="bg-blue-100 border border-blue-300 rounded-xl p-6 flex flex-col md:flex-row gap-6 items-center">
-              <div className="w-full md:w-1/2">
-                {clinica.imagen ? (
-                  <Image
-                    src={clinica.imagen ? `http://127.0.0.1:8000${clinica.imagen}` : '/default-image.png'}
-                    alt={clinica.nombre}
-                    width={600}
-                    height={400}
-                    className="rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-[400px] bg-gray-200 flex items-center justify-center rounded-lg">
-                    Sin imagen
-                  </div>
-                )}
-              </div>
+        const fetchConsultorios = async () => {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                setError('No se encontró el token de autenticación.');
+                setIsLoading(false);
+                return;
+            }
 
-              <div className="w-full md:w-1/2 text-gray-800">
-                <h2 className="text-2xl font-semibold mb-2">{clinica.nombre}</h2>
-                <p className="mb-4 text-blue-800">{clinica.descripcion}</p>
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/api/clinicas/', {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
+                setConsultorios(response.data);
+            } catch (err) {
+                console.error('Error al obtener los consultorios:', err);
+                setError('Error al cargar la lista de consultorios. Por favor, intenta de nuevo.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-                <ul className="space-y-2 text-sm">
-                  <li><span className="font-semibold text-blue-700">📍 Ubicación:</span> {clinica.ubicacion}</li>
-                  <li><span className="font-semibold text-blue-700">🕒 Horarios:</span> {clinica.hora_apertura} – {clinica.hora_cierre}</li>
-                </ul>
+        if (user && user.is_medico) {
+            fetchConsultorios();
+        }
+    }, [user, loading, router]);
 
-                <div className="flex-col gap-2 p-2 mt-12 text-right">
-                  <Link href={`/medico/consultorio/${clinica.id}`}>
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 transition mr-4">
-                      Editar consultorio
-                    </button>
-                  </Link>
-                  <button
-                    className="bg-red-600 text-white px-4 py-2 rounded-2xl hover:bg-red-700 transition"
-                    onClick={() => alert('Funcionalidad para eliminar pendiente')}
-                  >
-                    Eliminar consultorio
-                  </button>
-                </div>
-              </div>
+    const handleAddConsultorio = () => {
+        router.push('/medico/newConsultorio');
+    };
+
+    if (isLoading || loading) {
+        return (
+            <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
+                <p className="text-xl text-gray-700">Cargando...</p>
             </div>
-          </>
-        ) : (
-          <div className="text-center py-20">
-            <p className="text-gray-600 mb-6">No tienes ningún consultorio registrado todavía.</p>
-            <Link href="/medico/newConsultorio">
-              <button className="bg-green-600 text-white px-6 py-2 rounded-2xl shadow hover:bg-green-700 transition">
-                ➕ Agregar consultorio
-              </button>
-            </Link>
-          </div>
-        )}
-      </section>
-    </main>
-  );
+        );
+    }
+    
+    if (!user) {
+      return null;
+    }
+
+    return (
+        <main className="min-h-screen bg-gray-100">
+            <NavbarMedico />
+            <div className="container mx-auto p-6 mt-20">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-3xl font-bold text-gray-800">Mis Consultorios</h1>
+                </div>
+
+                {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+                
+                {consultorios.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center min-h-[50vh]">
+                        <p className="text-xl text-gray-500 mb-6">No tienes ningún consultorio registrado todavía.</p>
+                        <button
+                            onClick={handleAddConsultorio}
+                            className="bg-green-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-green-600 transition duration-300"
+                        >
+                            Agregar consultorio
+                        </button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {consultorios.map((consultorio) => (
+                            <Link key={consultorio.id} href={`/medico/consultorio?id=${consultorio.id}`}>
+                                <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden cursor-pointer">
+                                    <div className="relative w-full h-48">
+                                        <Image
+                                            src={consultorio.imagen || '/clinica1.jpeg'}
+                                            alt={consultorio.nombre}
+                                            layout="fill"
+                                            objectFit="cover"
+                                            className="rounded-t-xl"
+                                        />
+                                    </div>
+                                    <div className="p-4">
+                                        <h2 className="text-xl font-semibold text-gray-800 mb-2">{consultorio.nombre}</h2>
+                                        <p className="text-gray-600 text-sm">{consultorio.descripcion}</p>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </main>
+    );
 }

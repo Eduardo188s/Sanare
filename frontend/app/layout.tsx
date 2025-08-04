@@ -3,6 +3,9 @@ import "./globals.css";
 import type { ReactNode } from "react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { AuthProvider } from "@/context/AuthContext";
+
+// Importa AuthProvider
 
 export const metadata: Metadata = {
   title: "Sanare",
@@ -18,9 +21,12 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body>
-        <Header />
-        <Footer />
-        {children}
+        {}
+        <AuthProvider>
+          <Header />
+          {children}
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
