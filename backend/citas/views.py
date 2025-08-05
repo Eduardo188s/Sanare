@@ -231,7 +231,6 @@ class CitaViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         user = self.request.user
         instance = self.get_object()
-        # Solo el paciente o el médico asociado pueden actualizar su cita
         if user == instance.paciente or (user.is_medico and hasattr(user, 'medico_profile') and user.medico_profile == instance.medico):
             serializer.save()
         else:
