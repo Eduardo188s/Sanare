@@ -26,6 +26,7 @@ interface ConsultorioData {
     imagen: string;
     codigo_postal: string;
     estado: string;
+    medico_responsable?: Medico | number;
 }
 
 interface Medico {
@@ -152,15 +153,18 @@ export default function EditarConsultorio() {
                 });
                 setConsultorio(consultorioResponse.data);
 
+                if (consultorioResponse.data.medico_responsable) {
+                    if (typeof consultorioResponse.data.medico_responsable === 'object' && consultorioResponse.data.medico_responsable !== null && 'id' in consultorioResponse.data.medico_responsable) {
+                        setSelectedDoctor(consultorioResponse.data.medico_responsable.id);
+                    } else {
+                        setSelectedDoctor(Number(consultorioResponse.data.medico_responsable));
+                    }
+                }
+
                 const medicosResponse = await axios.get('http://127.0.0.1:8000/api/medicos/', {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 });
                 setMedicos(medicosResponse.data);
-                
-
-                if(consultorioResponse.data.medico_responsable) {
-                    setSelectedDoctor(consultorioResponse.data.medico_responsable);
-                }
 
             } catch (error) {
                 console.error('Error al cargar datos:', error);
@@ -189,7 +193,7 @@ export default function EditarConsultorio() {
             formData.append('imagen', imagen);
         }
         
-        if (selectedDoctor) {
+        if (selectedDoctor !== null) {
             formData.append('medico_responsable', selectedDoctor.toString());
         }
 
@@ -242,7 +246,6 @@ export default function EditarConsultorio() {
             if (response.status === 201) {
                 setMessage('✅ Nuevo médico registrado con éxito.');
                 setMostrarFormularioMedico(false);
-                // Volver a cargar la lista de médicos para actualizar el select
                 const medicosResponse = await axios.get('http://127.0.0.1:8000/api/medicos/', {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 });
@@ -352,7 +355,7 @@ export default function EditarConsultorio() {
                             </select>
                         </div>
 
-                       
+                        
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -370,7 +373,7 @@ export default function EditarConsultorio() {
                             </LocalizationProvider>
                         </div>
                         
-                       
+                        
                         {message && (
                             <div className={`p-3 rounded-lg text-center ${message.includes('✅') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                 {message}
@@ -396,7 +399,7 @@ export default function EditarConsultorio() {
                 </div>
             </div>
 
-          
+            
             {mostrarFormularioMedico && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
                     <div className="w-full max-w-2xl bg-white text-black p-8 rounded-lg relative shadow-lg">

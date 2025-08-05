@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-
 import NavbarMedico from './Navbar';
 import axios from 'axios';
 import Link from 'next/link';
@@ -15,6 +14,8 @@ interface Consultorio {
     descripcion: string;
     imagen: string;
     ubicacion: string;
+    especialidad: string; 
+    horarios: string; 
 }
 
 export default function MedicoDashboard() {
@@ -77,11 +78,17 @@ export default function MedicoDashboard() {
     return (
         <main className="min-h-screen bg-gray-100">
             <NavbarMedico />
-            <div className="container mx-auto p-6 mt-20">
+            <section className="max-w-6xl mx-auto px-4 py-12 mt-20">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-3xl font-bold text-gray-800">Mis Consultorios</h1>
+                    <button
+                        onClick={handleAddConsultorio}
+                        className="bg-green-600 text-white px-6 py-2 rounded-2xl shadow hover:bg-green-700 transition"
+                    >
+                        ➕ Agregar consultorio
+                    </button>
                 </div>
-
+                
                 {error && <p className="text-red-500 text-center mb-4">{error}</p>}
                 
                 {consultorios.length === 0 ? (
@@ -95,29 +102,44 @@ export default function MedicoDashboard() {
                         </button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 gap-6">
                         {consultorios.map((consultorio) => (
-                            <Link key={consultorio.id} href={`/medico/consultorio?id=${consultorio.id}`}>
-                                <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden cursor-pointer">
-                                    <div className="relative w-full h-48">
-                                        <Image
-                                            src={consultorio.imagen || '/clinica1.jpeg'}
-                                            alt={consultorio.nombre}
-                                            layout="fill"
-                                            objectFit="cover"
-                                            className="rounded-t-xl"
-                                        />
-                                    </div>
-                                    <div className="p-4">
-                                        <h2 className="text-xl font-semibold text-gray-800 mb-2">{consultorio.nombre}</h2>
-                                        <p className="text-gray-600 text-sm">{consultorio.descripcion}</p>
+                            <div key={consultorio.id} className="bg-blue-100 border border-blue-300 rounded-xl p-6 flex flex-col md:flex-row gap-6 items-center">
+                                <div className="w-full md:w-1/2">
+                                    <Image
+                                        src={consultorio.imagen || '/clinica1.jpeg'}
+                                        alt={consultorio.nombre}
+                                        width={600}
+                                        height={400}
+                                        className="rounded-lg object-cover"
+                                    />
+                                </div>
+                                <div className="w-full md:w-1/2 text-gray-800">
+                                    <h2 className="text-2xl font-semibold mb-2 text-center md:text-left">{consultorio.nombre}</h2>
+                                    <p className="mb-4 text-center md:text-left text-blue-800">
+                                        {consultorio.descripcion}
+                                    </p>
+                                    <ul className="space-y-2 text-sm">
+                                        <li><span className="font-semibold text-blue-700">📋 Especializada en:</span> {consultorio.especialidad || 'No especificada'}</li>
+                                        <li><span className="font-semibold text-blue-700">📍 Ubicada en:</span> {consultorio.ubicacion}</li>
+                                        <li><span className="font-semibold text-blue-700">🕒 Horarios:</span> {consultorio.horarios || 'No especificados'}</li>
+                                    </ul>
+                                    <div className="flex justify-end gap-4 p-2 mt-12">
+                                        <Link href={`/medico/consultorio?id=${consultorio.id}`} passHref>
+                                            <button className="bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 transition">
+                                                Editar consultorio
+                                            </button>
+                                        </Link>
+                                        <button className="bg-red-600 text-white px-4 py-2 rounded-2xl hover:bg-red-700 transition">
+                                            Eliminar consultorio
+                                        </button>
                                     </div>
                                 </div>
-                            </Link>
+                            </div>
                         ))}
                     </div>
                 )}
-            </div>
+            </section>
         </main>
     );
 }

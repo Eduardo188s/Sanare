@@ -17,6 +17,7 @@ type Cita = {
   motivo?: string | null;
 };
 
+
 export default function CitasPage() {
   const [citas, setCitas] = useState<Cita[]>([]);
 

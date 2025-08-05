@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import Image from 'next/image';
@@ -7,39 +7,31 @@ import Link from 'next/link';
 export default function RegisterPage() {
     const [userType, setUserType] = useState<'medico' | 'paciente'>('paciente');
     const [medicoForm, setMedicoForm] = useState({
+        username: '',
+        email: '',
+        password: '',
+        password2: '',
         firstName: '',
         lastName: '',
-        gender: '',
-        healthArea: '',
-        clinic: '',
-        age: '',
-        number: '',
-        city: '',
-        postal: '',
-        email: '',
-        phone: '',
     });
     const [pacienteForm, setPacienteForm] = useState({
+        username: '',
+        email: '',
+        password: '',
+        password2: '',
         firstName: '',
         lastName: '',
-        gender: '',
-        age: '',
-        number: '',
-        city: '',
-        postal: '',
-        email: '',
-        phone: '',
     });
     const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    const handleMedicoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleMedicoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setMedicoForm(prev => ({ ...prev, [name]: value }));
     };
 
-    const handlePacienteChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handlePacienteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setPacienteForm(prev => ({ ...prev, [name]: value }));
     };
@@ -54,26 +46,21 @@ export default function RegisterPage() {
             const response = await fetch('http://localhost:8000/api/auth/register/medico/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(medicoForm),
+                body: JSON.stringify({
+                    username: medicoForm.username,
+                    email: medicoForm.email,
+                    password: medicoForm.password,
+                    password2: medicoForm.password2,
+                    first_name: medicoForm.firstName,
+                    last_name: medicoForm.lastName,
+                }),
             });
 
             const data = await response.json();
 
             if (response.ok) {
                 setMessage(data.message || 'Registro de médico exitoso.');
-                setMedicoForm({
-                    firstName: '',
-                    lastName: '',
-                    gender: '',
-                    healthArea: '',
-                    clinic: '',
-                    age: '',
-                    number: '',
-                    city: '',
-                    postal: '',
-                    email: '',
-                    phone: '',
-                });
+                setMedicoForm({ username: '', email: '', password: '', password2: '', firstName: '', lastName: '' });
             } else {
                 const errorMessages = Object.values(data).flat().join(' ');
                 setError(errorMessages || 'Error en el registro del médico.');
@@ -96,24 +83,21 @@ export default function RegisterPage() {
             const response = await fetch('http://localhost:8000/api/auth/register/paciente/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(pacienteForm),
+                body: JSON.stringify({
+                    username: pacienteForm.username,
+                    email: pacienteForm.email,
+                    password: pacienteForm.password,
+                    password2: pacienteForm.password2,
+                    first_name: pacienteForm.firstName,
+                    last_name: pacienteForm.lastName,
+                }),
             });
 
             const data = await response.json();
 
             if (response.ok) {
                 setMessage(data.message || 'Registro de paciente exitoso.');
-                setPacienteForm({
-                    firstName: '',
-                    lastName: '',
-                    gender: '',
-                    age: '',
-                    number: '',
-                    city: '',
-                    postal: '',
-                    email: '',
-                    phone: '',
-                });
+                setPacienteForm({ username: '', email: '', password: '', password2: '', firstName: '', lastName: '' });
             } else {
                 const errorMessages = Object.values(data).flat().join(' ');
                 setError(errorMessages || 'Error en el registro del paciente.');
@@ -128,225 +112,8 @@ export default function RegisterPage() {
 
     return (
         <div className="flex min-h-screen">
+            {/* Contenedor de la izquierda (Logo) */}
             <div className={`w-1/2 flex items-center justify-center p-8 transition-all duration-500 ease-in-out ${userType === 'medico' ? 'bg-white text-black' : 'bg-[#6381A8] text-white'}`}>
-                {userType === 'medico' ? (
-                    <form onSubmit={handleMedicoSubmit} className="w-full max-w-2xl bg-white p-6 space-y-8">
-                        <h2 className="text-5xl font-bold text-center">Médico</h2>
-
-                        <div className="flex items-center gap-6">
-                            <label className="flex items-center gap-2">
-                                <input type="radio" name="gender" value="F" className="accent-blue-500" onChange={handleMedicoChange} checked={medicoForm.gender === 'F'} />
-                                <span className="text-sm">F.</span>
-                            </label>
-                            <label className="flex items-center gap-2">
-                                <input type="radio" name="gender" value="M" className="accent-blue-500" onChange={handleMedicoChange} checked={medicoForm.gender === 'M'} />
-                                <span className="text-sm">M.</span>
-                            </label>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 rounded px-4 py-2 ">
-                            <input
-                                type="text"
-                                name="firstName"
-                                placeholder="Nombre"
-                                value={medicoForm.firstName}
-                                onChange={handleMedicoChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                            <input
-                                type="text"
-                                name="lastName"
-                                placeholder="Apellido"
-                                value={medicoForm.lastName}
-                                onChange={handleMedicoChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 px-4 py-2">
-                            <select
-                                name="healthArea"
-                                value={medicoForm.healthArea}
-                                onChange={handleMedicoChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-                                <option>Área de salud</option>
-                                <option>Cirujano</option>
-                            </select>
-                            <select
-                                name="clinic"
-                                value={medicoForm.clinic}
-                                onChange={handleMedicoChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-                                <option>Clínica</option>
-                            </select>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 px-4 py-2">
-                            <input
-                                type="text"
-                                name="age"
-                                placeholder="Edad"
-                                value={medicoForm.age}
-                                onChange={handleMedicoChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                            <input
-                                type="text"
-                                name="number"
-                                placeholder="No."
-                                value={medicoForm.number}
-                                onChange={handleMedicoChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 rounded px-4 py-2">
-                            <input
-                                type="text"
-                                name="city"
-                                placeholder="Ciudad"
-                                value={medicoForm.city}
-                                onChange={handleMedicoChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                            <input
-                                type="text"
-                                name="postal"
-                                placeholder="Postal"
-                                value={medicoForm.postal}
-                                onChange={handleMedicoChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 px-4 py-2">
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="E-Mail*"
-                                value={medicoForm.email}
-                                onChange={handleMedicoChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                            <input
-                                type="text"
-                                name="phone"
-                                placeholder="Telefono"
-                                value={medicoForm.phone}
-                                onChange={handleMedicoChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                        </div>
-
-                        <div className="flex justify-center gap-6 pt-4">
-                            <button type="button" onClick={() => setUserType('paciente')} className="px-8 py-2 rounded-full bg-blue-200 text-white hover:bg-blue-300">
-                                Regresar
-                            </button>
-                            <button type="submit" disabled={loading} className="px-8 py-2 rounded-full bg-[#6381A8] text-white hover:bg-blue-300">
-                                {loading ? 'Enviando...' : 'Siguiente'}
-                            </button>
-                        </div>
-                    </form>
-                ) : (
-                    <form onSubmit={handlePacienteSubmit} className="w-full max-w-2xl bg-[#6381A8] p-8 space-y-8">
-                        <h2 className="text-5xl font-bold text-center text-white">Paciente</h2>
-
-                        <div className="flex items-center gap-6 text-white font-bold">
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="radio"
-                                    name="gender"
-                                    value="F"
-                                    onChange={handlePacienteChange}
-                                    checked={pacienteForm.gender === 'F'}
-                                    className="accent-blue-500" />
-                                <span className="text-sm">F.</span>
-                            </label>
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="radio"
-                                    name="gender"
-                                    value="M"
-                                    onChange={handlePacienteChange}
-                                    checked={pacienteForm.gender === 'M'}
-                                    className="accent-blue-500" />
-                                <span className="text-sm">M.</span>
-                            </label>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 text-white px-4 py-2">
-                            <input
-                                type="text"
-                                name="firstName"
-                                placeholder="Nombre"
-                                value={pacienteForm.firstName}
-                                onChange={handlePacienteChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400 text-black" />
-                            <input
-                                type="text"
-                                name="lastName"
-                                placeholder="Apellido"
-                                value={pacienteForm.lastName}
-                                onChange={handlePacienteChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400 text-black" />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 text-white px-4 py-2">
-                            <input
-                                type="text"
-                                name="age"
-                                placeholder="Edad"
-                                value={pacienteForm.age}
-                                onChange={handlePacienteChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400 text-black" />
-                            <input
-                                type="text"
-                                name="number"
-                                placeholder="No."
-                                value={pacienteForm.number}
-                                onChange={handlePacienteChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400 text-black" />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 text-white px-4 py-2">
-                            <input
-                                type="text"
-                                name="city"
-                                placeholder="Ciudad"
-                                value={pacienteForm.city}
-                                onChange={handlePacienteChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400 text-black" />
-                            <input
-                                type="text"
-                                name="postal"
-                                placeholder="Postal"
-                                value={pacienteForm.postal}
-                                onChange={handlePacienteChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400 text-black" />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 text-white px-4 py-2">
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="E-Mail*"
-                                value={pacienteForm.email}
-                                onChange={handlePacienteChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400 text-black" />
-                            <input
-                                type="text"
-                                name="phone"
-                                placeholder="Telefono"
-                                value={pacienteForm.phone}
-                                onChange={handlePacienteChange}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-white-400 text-black" />
-                        </div>
-
-                        <div className="flex justify-center gap-6 pt-4">
-                            <button type="button" onClick={() => setUserType('medico')} className="px-8 py-2 rounded-full bg-blue-200 text-white hover:bg-blue-300">
-                                Regresar
-                            </button>
-                            <button type="submit" disabled={loading} className="px-8 py-2 rounded-full bg-white text-black hover:bg-blue-300">
-                                {loading ? 'Enviando...' : 'Siguiente'}
-                            </button>
-                        </div>
-                    </form>
-                )}
-            </div>
-
-            <div className={`w-1/2 flex flex-col items-center justify-center p-12 transition-all duration-500 ease-in-out ${userType === 'medico' ? 'bg-[#6381A8] text-white' : 'bg-white text-black'}`}>
                 <div className="text-center">
                     <Image
                         src="/logo_sanare.jpg"
@@ -356,13 +123,15 @@ export default function RegisterPage() {
                         className="object-cover w-full h-full mx-auto"
                     />
                 </div>
-                <h2 className="text-4xl font-light mb-8 text-center mt-8">Regístrate en Sanare</h2>
+            </div>
 
-                {message && <p className="text-green-600 text-center mb-4">{message}</p>}
-                {error && <p className="text-red-600 text-center mb-4">{error}</p>}
+            {/* Contenedor de la derecha (Formularios y Selector de Tipo) */}
+            <div className={`w-1/2 flex flex-col items-center justify-center p-12 shadow-xl transition-all duration-500 ease-in-out ${userType === 'medico' ? 'bg-[#6381A8] text-white' : 'bg-white text-black'}`}>
+                <h2 className="text-4xl font-light mb-8 text-center mt-8">Regístrate en Sanare</h2>
 
                 <div className="bg-white rounded-lg p-8 w-full max-w-md text-black shadow-lg">
                     <h3 className="text-2xl font-semibold mb-6 text-center">Crear una Cuenta</h3>
+
                     <div className="flex justify-center mb-6">
                         <button
                             onClick={() => setUserType('paciente')}
@@ -377,13 +146,218 @@ export default function RegisterPage() {
                             Soy Médico
                         </button>
                     </div>
+
+                    {message && <p className="text-green-600 text-center mb-4">{message}</p>}
+                    {error && <p className="text-red-600 text-center mb-4">{error}</p>}
+
+                    {userType === 'paciente' ? (
+                        <form onSubmit={handlePacienteSubmit} className="space-y-4">
+                            <div>
+                                <label htmlFor="pacienteUsername" className="block text-gray-700 text-sm font-bold mb-2">
+                                    Nombre de Usuario
+                                </label>
+                                <input
+                                    type="text"
+                                    id="pacienteUsername"
+                                    name="username"
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Nombre de Usuario"
+                                    value={pacienteForm.username}
+                                    onChange={handlePacienteChange}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="pacienteEmail" className="block text-gray-700 text-sm font-bold mb-2">
+                                    Correo Electrónico
+                                </label>
+                                <input
+                                    type="email"
+                                    id="pacienteEmail"
+                                    name="email"
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="tu@ejemplo.com"
+                                    value={pacienteForm.email}
+                                    onChange={handlePacienteChange}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="pacienteFirstName" className="block text-gray-700 text-sm font-bold mb-2">
+                                    Nombre
+                                </label>
+                                <input
+                                    type="text"
+                                    id="pacienteFirstName"
+                                    name="firstName"
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Tu Nombre"
+                                    value={pacienteForm.firstName}
+                                    onChange={handlePacienteChange}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="pacienteLastName" className="block text-gray-700 text-sm font-bold mb-2">
+                                    Apellido
+                                </label>
+                                <input
+                                    type="text"
+                                    id="pacienteLastName"
+                                    name="lastName"
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Tu Apellido"
+                                    value={pacienteForm.lastName}
+                                    onChange={handlePacienteChange}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="pacientePassword" className="block text-gray-700 text-sm font-bold mb-2">
+                                    Contraseña
+                                </label>
+                                <input
+                                    type="password"
+                                    id="pacientePassword"
+                                    name="password"
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="********"
+                                    value={pacienteForm.password}
+                                    onChange={handlePacienteChange}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="pacientePassword2" className="block text-gray-700 text-sm font-bold mb-2">
+                                    Confirmar Contraseña
+                                </label>
+                                <input
+                                    type="password"
+                                    id="pacientePassword2"
+                                    name="password2"
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="********"
+                                    value={pacienteForm.password2}
+                                    onChange={handlePacienteChange}
+                                    required
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full focus:outline-none focus:shadow-outline transition duration-200"
+                                disabled={loading}
+                            >
+                                {loading ? 'Registrando...' : 'Registrar Paciente'}
+                            </button>
+                        </form>
+                    ) : (
+                        <form onSubmit={handleMedicoSubmit} className="space-y-4">
+                            <div>
+                                <label htmlFor="medicoUsername" className="block text-gray-700 text-sm font-bold mb-2">
+                                    Nombre de Usuario
+                                </label>
+                                <input
+                                    type="text"
+                                    id="medicoUsername"
+                                    name="username"
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Nombre de Usuario"
+                                    value={medicoForm.username}
+                                    onChange={handleMedicoChange}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="medicoEmail" className="block text-gray-700 text-sm font-bold mb-2">
+                                    Correo Electrónico
+                                </label>
+                                <input
+                                    type="email"
+                                    id="medicoEmail"
+                                    name="email"
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="tu@ejemplo.com"
+                                    value={medicoForm.email}
+                                    onChange={handleMedicoChange}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="medicoFirstName" className="block text-gray-700 text-sm font-bold mb-2">
+                                    Nombre
+                                </label>
+                                <input
+                                    type="text"
+                                    id="medicoFirstName"
+                                    name="firstName"
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Tu Nombre"
+                                    value={medicoForm.firstName}
+                                    onChange={handleMedicoChange}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="medicoLastName" className="block text-gray-700 text-sm font-bold mb-2">
+                                    Apellido
+                                </label>
+                                <input
+                                    type="text"
+                                    id="medicoLastName"
+                                    name="lastName"
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Tu Apellido"
+                                    value={medicoForm.lastName}
+                                    onChange={handleMedicoChange}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="medicoPassword" className="block text-gray-700 text-sm font-bold mb-2">
+                                    Contraseña
+                                </label>
+                                <input
+                                    type="password"
+                                    id="medicoPassword"
+                                    name="password"
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="********"
+                                    value={medicoForm.password}
+                                    onChange={handleMedicoChange}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="medicoPassword2" className="block text-gray-700 text-sm font-bold mb-2">
+                                    Confirmar Contraseña
+                                </label>
+                                <input
+                                    type="password"
+                                    id="medicoPassword2"
+                                    name="password2"
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="********"
+                                    value={medicoForm.password2}
+                                    onChange={handleMedicoChange}
+                                    required
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full focus:outline-none focus:shadow-outline transition duration-200"
+                                disabled={loading}
+                            >
+                                {loading ? 'Registrando...' : 'Registrar Médico'}
+                            </button>
+                        </form>
+                    )}
+                    <p className={`text-center text-sm mt-4 ${userType === 'medico' ? 'text-white' : 'text-gray-600'}`}>
+                        ¿Ya tienes una cuenta?{' '}
+                        <Link href="/login" className="text-blue-600 hover:text-blue-800 font-bold">
+                            Inicia Sesión
+                        </Link>
+                    </p>
                 </div>
-                <p className={`text-center text-sm mt-4 ${userType === 'medico' ? 'text-white' : 'text-gray-600'}`}>
-                    ¿Ya tienes una cuenta?{' '}
-                    <Link href="/login" className="text-blue-600 hover:text-blue-800 font-bold">
-                        Inicia Sesión
-                    </Link>
-                </p>
             </div>
         </div>
     );
