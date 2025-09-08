@@ -32,11 +32,33 @@ export default function NewConsultorioPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [imagenPreview, setImagenPreview] = useState<string>('/clinica1.jpeg');
+    const [clinicaExistente, setClinicaExistente] = useState(false);
 
     useEffect(() => {
         if (!loading && (!user || !user.is_medico)) {
             router.push('/login');
         }
+
+        const fetchClinica = async () => {
+            if (user?.is_medico) {
+                try {
+                    const accessToken = localStorage.getItem('accessToken');
+                    const response = await axios.get('http://127.0.0.1:8000/api/clinicas/', {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    });
+                    const misClinicas = response.data.filter((c: any) => c.medico_responsable?.id === user.id);
+                    if (misClinicas.length > 0) {
+                        setClinicaExistente(true);
+                    }
+                } catch (err) {
+                    console.error('Error al verificar clínica existente:', err);
+                }
+            }
+        };
+
+        fetchClinica();
     }, [user, loading, router]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -50,9 +72,7 @@ export default function NewConsultorioPage() {
             setFormData(prev => ({ ...prev, imagen: file }));
             const reader = new FileReader();
             reader.onload = () => {
-                if (reader.result) {
-                    setImagenPreview(reader.result as string);
-                }
+                if (reader.result) setImagenPreview(reader.result as string);
             };
             reader.readAsDataURL(file);
         }
@@ -89,10 +109,7 @@ export default function NewConsultorioPage() {
         data.append('ubicacion', formData.ubicacion);
         data.append('hora_apertura', formData.hora_apertura);
         data.append('hora_cierre', formData.hora_cierre);
-        data.append('medico_responsable', user.id.toString());
-        if (formData.imagen) {
-            data.append('imagen', formData.imagen);
-        }
+        if (formData.imagen) data.append('imagen', formData.imagen);
 
         try {
             const response = await axios.post('http://127.0.0.1:8000/api/clinicas/', data, {
@@ -102,11 +119,8 @@ export default function NewConsultorioPage() {
                 }
             });
 
-            if (response.status === 201) {
-                router.push('/medico');
-            } else {
-                setError('Error al crear el consultorio.');
-            }
+            if (response.status === 201) router.push('/medico');
+            else setError('Error al crear el consultorio.');
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {
                 if (error.response.status === 401) {
@@ -115,9 +129,7 @@ export default function NewConsultorioPage() {
                 } else {
                     setError(`Error del servidor: ${JSON.stringify(error.response.data)}`);
                 }
-            } else {
-                setError('Error de conexión o datos inválidos.');
-            }
+            } else setError('Error de conexión o datos inválidos.');
         } finally {
             setIsSubmitting(false);
         }
@@ -136,118 +148,109 @@ export default function NewConsultorioPage() {
 
                     {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
-                            <div className="relative flex flex-col items-center">
-                                <Image
-                                    src={imagenPreview}
-                                    alt="Portada Consultorio"
-                                    width={600}
-                                    height={400}
-                                    className="rounded-lg shadow object-cover"
-                                />
-                                <label className="absolute bottom-4 right-4 bg-white rounded-full p-3 shadow-md cursor-pointer hover:bg-gray-100 transition">
-                                    <FaCamera className="text-gray-700 text-lg" />
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleFileChange}
-                                        className="hidden"
+                    {clinicaExistente ? (
+                        <p className="text-center text-gray-500">Ya tienes un consultorio agregado. No puedes agregar otro.</p>
+                    ) : (
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+                                <div className="relative flex flex-col items-center">
+                                    <Image
+                                        src={imagenPreview}
+                                        alt="Portada Consultorio"
+                                        width={600}
+                                        height={400}
+                                        className="rounded-lg shadow object-cover"
                                     />
-                                </label>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-semibold mb-1" htmlFor="nombre">
-                                        Nombre de la clínica:
+                                    <label className="absolute bottom-4 right-4 bg-white rounded-full p-3 shadow-md cursor-pointer hover:bg-gray-100 transition">
+                                        <FaCamera className="text-gray-700 text-lg" />
+                                        <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
                                     </label>
-                                    <input
-                                        id="nombre"
-                                        name="nombre"
-                                        type="text"
-                                        value={formData.nombre}
-                                        onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                        required
-                                    />
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-semibold mb-1" htmlFor="descripcion">
-                                        Descripción:
-                                    </label>
-                                    <textarea
-                                        id="descripcion"
-                                        name="descripcion"
-                                        rows={3}
-                                        value={formData.descripcion}
-                                        onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-semibold mb-1" htmlFor="ubicacion">
-                                        Ubicación:
-                                    </label>
-                                    <input
-                                        id="ubicacion"
-                                        name="ubicacion"
-                                        type="text"
-                                        value={formData.ubicacion}
-                                        onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Médico responsable:</label>
-                                    <p className="text-gray-700 font-semibold">
-                                        {user?.username}
-                                    </p>
-                                </div>
-
-                                <div className="flex gap-4">
-                                    <div className="w-1/2">
-                                        <label htmlFor="hora_apertura" className="block text-sm font-medium text-gray-700">Hora de Apertura</label>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-1" htmlFor="nombre">Nombre del consultorio:</label>
                                         <input
-                                            type="time"
-                                            id="hora_apertura"
-                                            name="hora_apertura"
-                                            value={formData.hora_apertura}
+                                            id="nombre"
+                                            name="nombre"
+                                            type="text"
+                                            value={formData.nombre}
                                             onChange={handleChange}
                                             className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                                             required
                                         />
                                     </div>
-                                    <div className="w-1/2">
-                                        <label htmlFor="hora_cierre" className="block text-sm font-medium text-gray-700">Hora de Cierre</label>
-                                        <input
-                                            type="time"
-                                            id="hora_cierre"
-                                            name="hora_cierre"
-                                            value={formData.hora_cierre}
+
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-1" htmlFor="descripcion">Descripción:</label>
+                                        <textarea
+                                            id="descripcion"
+                                            name="descripcion"
+                                            rows={3}
+                                            value={formData.descripcion}
                                             onChange={handleChange}
                                             className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                                             required
                                         />
                                     </div>
-                                </div>
 
-                                <button
-                                    type="submit"
-                                    className={`w-full py-2 px-6 rounded-lg shadow-lg text-sm font-medium text-white transition
-                                        ${isSubmitting ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
-                                    disabled={isSubmitting}
-                                >
-                                    {isSubmitting ? 'Guardando...' : 'Guardar consultorio'}
-                                </button>
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-1" htmlFor="ubicacion">Ubicación:</label>
+                                        <input
+                                            id="ubicacion"
+                                            name="ubicacion"
+                                            type="text"
+                                            value={formData.ubicacion}
+                                            onChange={handleChange}
+                                            className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Médico responsable:</label>
+                                        <p className="text-gray-700 font-semibold">{user?.username}</p>
+                                    </div>
+
+                                    <div className="flex gap-4">
+                                        <div className="w-1/2">
+                                            <label htmlFor="hora_apertura" className="block text-sm font-medium text-gray-700">Hora de Apertura</label>
+                                            <input
+                                                type="time"
+                                                id="hora_apertura"
+                                                name="hora_apertura"
+                                                value={formData.hora_apertura}
+                                                onChange={handleChange}
+                                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                                required
+                                            />
+                                        </div>
+                                        <div className="w-1/2">
+                                            <label htmlFor="hora_cierre" className="block text-sm font-medium text-gray-700">Hora de Cierre</label>
+                                            <input
+                                                type="time"
+                                                id="hora_cierre"
+                                                name="hora_cierre"
+                                                value={formData.hora_cierre}
+                                                onChange={handleChange}
+                                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        className={`w-full py-2 px-6 rounded-lg shadow-lg text-sm font-medium text-white transition
+                                            ${isSubmitting ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? 'Guardando...' : 'Guardar consultorio'}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    )}
                 </div>
             </section>
         </main>

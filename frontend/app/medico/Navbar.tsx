@@ -3,12 +3,16 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function NavbarMedico() {
+export default function NavbarMedico({ hayNuevas }: { hayNuevas?: boolean }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const router = useRouter();
 
   const handleConsultorioClick = () => {
     router.push('/medico');
+  };
+
+  const handleNotificacionesClick = () => {
+    router.push('/medico/notificaciones');
   };
 
   return (
@@ -82,9 +86,20 @@ export default function NavbarMedico() {
           </svg>
         </div>
 
-        {/* Iconos */}
-        <img src="/icono_notificaciones.png" alt="Notificaciones" className="h-8" />
+        {/* Icono de Notificaciones */}
+        <div className="relative">
+          <img
+            src="/icono_notificaciones.png"
+            alt="Notificaciones"
+            className="h-8 cursor-pointer"
+            onClick={handleNotificacionesClick}
+          />
+          {hayNuevas && (
+            <span className="absolute top-0 right-0 block w-3 h-3 bg-red-500 rounded-full"></span>
+          )}
+        </div>
         
+        {/* Icono de Perfil */}
         <img 
         src="/icono_doctor.png" 
         alt="Perfil Médico" 

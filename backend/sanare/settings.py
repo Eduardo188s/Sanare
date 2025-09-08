@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from datetime import timedelta # <-- Nueva importación
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,10 +22,10 @@ ALLOWED_HOSTS = []
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication', # <-- Añade esta línea
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny', # Deja esto por ahora, luego puedes ajustarlo
+        'rest_framework.permissions.AllowAny',
     ]
 }
 
@@ -35,8 +35,8 @@ INSTALLED_APPS = [
     'citas',
     'corsheaders',
     'rest_framework',
-    'rest_framework_simplejwt', # <-- Añade esta línea
-    'accounts',                 # <-- Añade esta línea
+    'rest_framework_simplejwt',
+    'accounts',                 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -132,7 +132,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configuración de Django REST Framework Simple JWT
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
@@ -165,5 +164,4 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-# Especificar el modelo de usuario personalizado
 AUTH_USER_MODEL = 'accounts.User'

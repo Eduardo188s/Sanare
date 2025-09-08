@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
+  const [userNameOrEmail, setUserNameOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const { login, loading } = useAuth();
@@ -16,7 +16,7 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      await login(username, password);
+      await login(userNameOrEmail, password);
     } catch (err: any) {
       setError(err.message || 'Error desconocido al iniciar sesión.');
       console.error('Login failed in component:', err);
@@ -50,10 +50,10 @@ export default function LoginPage() {
               <div>
                 <input
                   type="text"
-                  placeholder="Correo Electrónico o Usuario"
+                  placeholder="Nombre de Usuario"
                   className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={userNameOrEmail}
+                  onChange={(e) => setUserNameOrEmail(e.target.value)}
                   required
                 />
               </div>

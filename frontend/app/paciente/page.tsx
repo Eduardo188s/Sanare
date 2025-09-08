@@ -5,15 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import NavbarPaciente from "./NavBar";
 
-type Especialidad = {
-  id: number;
-  nombre: string;
-};
-
 type Medico = {
   id: number;
-  nombre: string;
-  especialidad: Especialidad | null;
+  full_name: string;
+  especialidad_nombre: string | null;
 };
 
 type Clinica = {
@@ -30,6 +25,7 @@ type Clinica = {
 
 export default function PacienteDashboard() {
   const [clinicas, setClinicas] = useState<Clinica[]>([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/clinicas/")
@@ -38,37 +34,46 @@ export default function PacienteDashboard() {
       .catch((error) => console.error("Error al cargar clínicas:", error));
   }, []);
 
+  const filteredClinicas = clinicas.filter((clinica) =>
+    clinica.nombre.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <main className="min-h-screen bg-white">
-      <NavbarPaciente />
-
-      <section className="max-w-6xl mx-auto px-4 py-12">
-        {clinicas.map((clinica) => (
-        <div key={clinica.id} className="bg-blue-100 border border-blue-300 rounded-xl p-6 flex flex-col md:flex-row gap-6 items-center">
-          <div className="w-full md:w-1/2">
-          {clinica.imagen ? (
-            <Image
-              src={clinica.imagen}
-              alt={clinica.nombre}
-              width={600}
-              height={400}
-              className="rounded-lg object-cover"
-            />
-          ) : (
-            <p>Sin imagen disponible</p>
-          )}
+      <NavbarPaciente onSearch={setSearch} />
+      <section className="max-w-6xl mx-auto px-4 py-12 space-y-6">
+        {filteredClinicas.length > 0 ? (
+          filteredClinicas.map((clinica) => (
+            <div
+              key={clinica.id}
+              className="bg-blue-100 border border-blue-300 rounded-xl p-6 flex flex-col md:flex-row gap-6 items-center"
+            >
+              {/* Imagen */}
+              <div className="w-full md:w-1/2">
+                {clinica.imagen ? (
+                  <Image
+                    src={clinica.imagen}
+                    alt={clinica.nombre}
+                    width={600}
+                    height={400}
+                    className="rounded-lg object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <p>Sin imagen disponible</p>
+                )}
             
           </div>
 
           <div className="w-full md:w-1/2 text-gray-800">
-            <h2 className="text-2xl font-semibold mb-2 text-center md:text-left">{clinica.nombre}</h2>
+            <h2 className="text-2xl font-semibold mb-2 text-center md:text-left">{clinica.nombre || "Sin nombre"}</h2>
             <p className="mb-4 text-center md:text-left text-blue-800">
-              {clinica.descripcion} 
+              {clinica.descripcion || "Sin descripción"} 
             </p>
 
             <ul className="space-y-2 text-sm">
-              <li><span className="font-semibold text-blue-700">📋 Especialidad: </span> {clinica.medico_responsable?.especialidad?.nombre || "No especificada"} </li>
-              <li><span className="font-semibold text-blue-700">👨‍⚕️ Médico responsable: </span>{" "}{clinica.medico_responsable?.nombre || "No especificado"} </li>
+              <li><span className="font-semibold text-blue-700">📋 Especialidad: </span> {clinica.medico_responsable?.especialidad_nombre || "No especificada"} </li>
+              <li><span className="font-semibold text-blue-700">👨‍⚕️ Médico responsable: </span>{" "}{clinica.medico_responsable?.full_name || "No especificado"} </li>
               <li><span className="font-semibold text-blue-700">📍 Ubicada en:</span> {clinica.ubicacion}</li>
               <li><span className="font-semibold text-blue-700">🕒 Horarios:</span> {" "}{clinica.hora_apertura && clinica.hora_cierre? `${clinica.hora_apertura} - ${clinica.hora_cierre}` : "No especificado"}</li>
             </ul>
@@ -80,7 +85,10 @@ export default function PacienteDashboard() {
             </div>
           </div>
         </div>
-        ))}
+        ))
+      ) : (
+            <p className="text-center text-gray-500">No hay clínicas disponibles.</p>
+      )}
       </section>
     </main>
   );

@@ -8,22 +8,56 @@ import axios from 'axios';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
-interface Consultorio {
+type Medico = {
+  id: number;
+  full_name: string;
+  especialidad_nombre: string | null;
+};
+
+interface Clinica{
     id: number;
     nombre: string;
     descripcion: string;
     imagen: string;
     ubicacion: string;
     especialidad: string; 
-    horarios: string; 
+    hora_apertura: string;
+    hora_cierre: string;
+    medico_responsable: Medico | null;
 }
 
 export default function MedicoDashboard() {
     const { user, loading } = useAuth();
     const router = useRouter();
-    const [consultorios, setConsultorios] = useState<Consultorio[]>([]);
+    const [consultorios, setConsultorios] = useState<Clinica[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const [hayNuevas, setHayNuevas] = useState(false);
+
+    useEffect(() => {
+    const fetchNotificaciones = async () => {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) return;
+
+      try {
+        const res = await axios.get('http://127.0.0.1:8000/api/notificaciones/my/', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        const nuevas = res.data.some((n: any) => !n.leida);
+        setHayNuevas(nuevas);
+      } catch (err) {
+        console.error('Error al cargar notificaciones:', err);
+      }
+    };
+
+    if (user?.is_medico) {
+      fetchNotificaciones();
+
+    const interval = setInterval(fetchNotificaciones, 30000);
+    return () => clearInterval(interval);
+    }
+  }, [user]);
 
     useEffect(() => {
         if (!loading && (!user || !user.is_medico)) {
@@ -75,12 +109,34 @@ export default function MedicoDashboard() {
       return null;
     }
 
+    const handleDeleteConsultorio = async (id: number) => {
+    const confirmDelete = confirm("¿Estás seguro de que quieres eliminar este consultorio?");
+    if (!confirmDelete) return;
+
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+        setError('No se encontró el token de autenticación.');
+        return;
+    }
+
+    try {
+        await axios.delete(`http://127.0.0.1:8000/api/clinicas/${id}/`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        setConsultorios(prev => prev.filter(c => c.id !== id));
+    } catch (err) {
+        console.error('Error al eliminar consultorio:', err);
+        setError('No se pudo eliminar el consultorio. Intenta de nuevo.');
+    }
+};
+
     return (
         <main className="min-h-screen bg-gray-100">
-            <NavbarMedico />
+            <NavbarMedico hayNuevas={hayNuevas} />
             <section className="max-w-6xl mx-auto px-4 py-12 mt-20">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-3xl font-bold text-gray-800">Mis Consultorios</h1>
+                    <h1 className="text-3xl font-bold text-gray-800">Mi Consultorio</h1>
                     <button
                         onClick={handleAddConsultorio}
                         className="bg-green-600 text-white px-6 py-2 rounded-2xl shadow hover:bg-green-700 transition"
@@ -120,17 +176,20 @@ export default function MedicoDashboard() {
                                         {consultorio.descripcion}
                                     </p>
                                     <ul className="space-y-2 text-sm">
-                                        <li><span className="font-semibold text-blue-700">📋 Especializada en:</span> {consultorio.especialidad || 'No especificada'}</li>
+                                        <li><span className="font-semibold text-blue-700">📋 Especializada en:</span> {consultorio.medico_responsable?.especialidad_nombre || "No especificada"}</li>
                                         <li><span className="font-semibold text-blue-700">📍 Ubicada en:</span> {consultorio.ubicacion}</li>
-                                        <li><span className="font-semibold text-blue-700">🕒 Horarios:</span> {consultorio.horarios || 'No especificados'}</li>
+                                        <li><span className="font-semibold text-blue-700">🕒 Horarios:</span> {" "}{consultorio.hora_apertura && consultorio.hora_cierre? `${consultorio.hora_apertura} - ${consultorio.hora_cierre}` : "No especificado"}</li>
                                     </ul>
                                     <div className="flex justify-end gap-4 p-2 mt-12">
-                                        <Link href={`/medico/consultorio?id=${consultorio.id}`} passHref>
-                                            <button className="bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 transition">
+                                        <Link href={`/medico/editarConsultorio/${consultorio.id}`} passHref>
+                                            <button
+                                            className="bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 transition">
                                                 Editar consultorio
                                             </button>
                                         </Link>
-                                        <button className="bg-red-600 text-white px-4 py-2 rounded-2xl hover:bg-red-700 transition">
+                                        <button
+                                        onClick={() => handleDeleteConsultorio(consultorio.id)}
+                                        className="bg-red-600 text-white px-4 py-2 rounded-2xl hover:bg-red-700 transition">
                                             Eliminar consultorio
                                         </button>
                                     </div>

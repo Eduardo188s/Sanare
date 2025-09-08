@@ -3,14 +3,17 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 
-// Define la interfaz para el usuario en el contexto
 interface User {
     id: number;
     username: string;
     email: string;
     is_medico: boolean;
     is_paciente: boolean;
-    full_name: string;
+    full_name?: string;
+    telefono?: string;
+    sexo?: string;
+    fecha_nacimiento?: string;
+    especialidad?: string;
 }
 
 interface AuthContextType {
@@ -19,6 +22,7 @@ interface AuthContextType {
     login: (username: string, password: string) => Promise<void>;
     logout: () => void;
     loading: boolean;
+    refreshAccessToken: () => Promise<string | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -49,15 +53,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setLoading(false);
     }, []);
 
-    const login = async (username: string, password: string) => {
+    const login = async (userNameOrEmail: string, password: string) => {
         setLoading(true);
+        console.log("Access Token:", accessToken);
         try {
             const response = await fetch('http://localhost:8000/api/auth/token/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({ username: userNameOrEmail, password }),
             });
 
             const data = await response.json();
@@ -75,6 +80,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     is_medico: decodedToken.is_medico,
                     is_paciente: decodedToken.is_paciente,
                     full_name: decodedToken.full_name || '',
+                    telefono: decodedToken.telefono,
+                    sexo: decodedToken.sexo,
+                    fecha_nacimiento: decodedToken.fecha_nacimiento,
+                    especialidad: decodedToken.especialidad,
                 };
                 setUser(userData);
 
@@ -82,13 +91,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 localStorage.setItem('refreshToken', refresh);
                 localStorage.setItem('user', JSON.stringify(userData));
 
-                // Redirección a la página principal de cada rol
                 if (userData.is_medico) {
                     router.push('/medico'); 
                 } else if (userData.is_paciente) {
                     router.push('/paciente'); 
                 } else {
-                    // Si no tiene un rol específico, puedes redirigirlo a una página general o de inicio
                     router.push('/'); 
                 }
 
@@ -143,7 +150,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, accessToken, login, logout, loading }}>
+        <AuthContext.Provider value={{ user, accessToken, login, logout, loading, refreshAccessToken }}>
             {children}
         </AuthContext.Provider>
     );

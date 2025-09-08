@@ -10,16 +10,12 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import dayjs, { Dayjs } from 'dayjs';
-
-type Especialidad = {
-  id: number;
-  nombre: string;
-};
+import { useAuth } from '@/context/AuthContext';
 
 type Medico = {
   id: number;
-  nombre: string;
-  especialidad: Especialidad;
+  full_name: string;
+  especialidad_nombre: string | null;
 };
 
 type Clinica = {
@@ -56,9 +52,7 @@ export default function ClinicaDetalle() {
 
     fetch(`http://127.0.0.1:8000/api/clinicas/${clinicaId}/`)
       .then((res) => res.json())
-      .then((data) => {
-        setClinica(data);
-      })
+      .then((data) => setClinica(data))
       .catch((err) => console.error('Error al cargar la clínica:', err));
   }, [clinicaId]);
 
@@ -77,24 +71,69 @@ export default function ClinicaDetalle() {
     });
   };
 
-  // Carga horarios disponibles cuando cambian la fecha o la clínica (medico fijo)
   useEffect(() => {
     if (!selectedDate || !clinica?.medico_responsable) return;
 
     const fecha = selectedDate.format('YYYY-MM-DD');
-    const medicoId = clinica.medico_responsable.id;
 
-    fetch(`http://127.0.0.1:8000/api/horarios-disponibles/${medicoId}/?fecha=${fecha}`)
+    fetch(`http://127.0.0.1:8000/api/clinicas/${clinicaId}/horarios_disponibles/?fecha=${fecha}`)
       .then((res) => res.json())
       .then((data) => {
-        const horas = data.map((h: any) => h.hora.slice(0, 5));
-        const horariosFiltrados = filtrarHorariosPorRango(horas, clinica.hora_apertura, clinica.hora_cierre);
+        const horariosFiltrados = filtrarHorariosPorRango(
+          data,
+          clinica.hora_apertura,
+          clinica.hora_cierre
+        );
         setHorarios(horariosFiltrados);
       })
       .catch((err) => console.error('Error cargando horarios disponibles:', err));
-  }, [selectedDate, clinica]);
+  }, [selectedDate, clinica, clinicaId]);
+
+  const { accessToken, refreshAccessToken } = useAuth();
+
+  const fetchConToken = async (url: string, options: RequestInit) => {
+  let token = accessToken;
+
+  if (!token) {
+    token = await refreshAccessToken();
+    if (!token) {
+      alert('Tu sesión expiró. Por favor, inicia sesión nuevamente.');
+      router.push('/login');
+      return null;
+    }
+  }
+
+  const opciones = { ...options, headers: { ...options.headers, Authorization: `Bearer ${token}` } };
+
+  let response = await fetch(url, opciones);
+
+  if (response.status === 401) {
+    const nuevoToken = await refreshAccessToken();
+    if (!nuevoToken) {
+      alert('Tu sesión expiró. Por favor, inicia sesión nuevamente.');
+      router.push('/login');
+      return null;
+    }
+
+    opciones.headers = { ...opciones.headers, Authorization: `Bearer ${nuevoToken}` };
+    response = await fetch(url, opciones);
+  }
+
+  return response;
+};
 
   const agendarCita = async () => {
+    let token = accessToken;
+
+    if (!token) {
+      token = await refreshAccessToken();
+      if (!token) {
+        alert('Debes iniciar sesión para agendar una cita');
+        router.push('/login');
+        return;
+      }
+    }
+
     if (!selectedDate || !selectedHour) {
       alert('Selecciona una fecha y un horario.');
       return;
@@ -115,41 +154,37 @@ export default function ClinicaDetalle() {
       return;
     }
 
-    const tempPacienteId = pacienteId || 1;
-    const tempClinicaId = clinicaId || 1;
-
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/citas/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          paciente: tempPacienteId,
-          clinica: tempClinicaId,
-          medico: clinica.medico_responsable.id,
-          fecha: selectedDate.format('YYYY-MM-DD'),
-          hora: selectedHour,
-          motivo: motivo || 'Consulta general',
-        }),
-      });
+      const response = await fetchConToken(
+        `http://127.0.0.1:8000/api/medicos/${clinica.medico_responsable.id}/agendar-cita/`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            paciente_id: pacienteId || 1,
+            clinica_id: clinicaId,
+            medico_id: clinica.medico_responsable.id,
+            fecha: selectedDate.format('YYYY-MM-DD'),
+            hora: selectedHour,
+            motivo: motivo || 'Consulta general'
+          }),
+        }
+      );
 
-      console.log('Status:', response.status);
+      if (!response) return;
 
       if (response.ok) {
         alert('Cita agendada correctamente');
         router.push('/paciente/citas');
       } else {
-        let errorText;
-        try {
-          errorText = await response.text();
-        } catch {
-          errorText = 'Sin mensaje de error';
-        }
-        console.error('Error al agendar cita:', errorText);
-        alert('Error al agendar cita');
+        const errorData = await response.json();
+        const mensaje = errorData?.error || errorData?.detail || 'Ocurrió un error al agendar la cita';
+        alert(mensaje);
+        router.push('/paciente/citas');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error en la solicitud:', error);
-      alert('Error de red al agendar cita');
+      alert(error.message || 'Error de red al agendar cita');
     }
   };
 
@@ -222,20 +257,10 @@ export default function ClinicaDetalle() {
         {/* Calendario y disponibilidad */}
         <div className="flex flex-col gap-4 text-gray-800">
           <h2 className="text-2xl font-bold">{clinica.nombre}</h2>
-          <p>
-            <strong>Descripción:</strong> {clinica.descripcion || 'Sin descripción'}
-          </p>
-          <p>
-            <strong>Ubicación:</strong> {clinica.ubicacion || 'No especificada'}
-          </p>
-          <p>
-            <strong>Especialidad:</strong>{' '}
-            {clinica.medico_responsable?.especialidad.nombre || 'No especificada'}
-          </p>
-          <p>
-            <strong>Médico responsable:</strong>{' '}
-            {clinica.medico_responsable?.nombre || 'No especificado'}
-          </p>
+          <p><strong>Descripción:</strong> {clinica.descripcion || 'Sin descripción'}</p>
+          <p><strong>Ubicación:</strong> {clinica.ubicacion || 'No especificada'}</p>
+          <p><strong>Especialidad:</strong> {clinica.medico_responsable?.especialidad_nombre || 'No especificada'}</p>
+          <p><strong>Médico responsable:</strong> {clinica.medico_responsable?.full_name || 'No especificado'}</p>
 
           {/* Motivo de la cita */}
           <div className="mt-4">
@@ -250,7 +275,6 @@ export default function ClinicaDetalle() {
           </div>
 
           <p className="text-blue-700 font-medium mt-4">Selecciona una fecha:</p>
-
           <div className="border rounded-md p-4">
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateCalendar value={selectedDate} onChange={setSelectedDate} />
@@ -265,9 +289,7 @@ export default function ClinicaDetalle() {
               >
                 <option value="">Elige una hora</option>
                 {horarios.map((hora, idx) => (
-                  <option key={idx} value={hora}>
-                    {hora}
-                  </option>
+                  <option key={idx} value={hora}>{hora}</option>
                 ))}
               </select>
             </div>

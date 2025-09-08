@@ -6,10 +6,9 @@ import { usePathname } from "next/navigation";
 export function Header() {
   const pathname = usePathname();
 
-  // Si está en una ruta de médico o paciente, no mostrar este header
   const isRolPage = pathname.startsWith("/medico") || pathname.startsWith("/paciente");
 
-  if (isRolPage) return null; // O puedes renderizar <HeaderMedico /> aquí
+  if (isRolPage) return null;
 
   return (
     <header className="w-1/2 bg-[#6381A8] text-white py-8 px-6 shadow-md ml-auto">
