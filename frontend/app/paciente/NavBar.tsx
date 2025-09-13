@@ -48,7 +48,7 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
             className="flex items-center space-x-1 cursor-pointer"
             onClick={() => setMenuAbierto(!menuAbierto)}
           >
-            <span className="font-semibold">Configuración</span>
+            <span className="font-semibold text-black">Configuración</span>
             <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
@@ -59,7 +59,7 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
           </div>
 
           {menuAbierto && (
-            <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg z-10">
+            <div className="absolute right-0 mt-2 w-40 bg-white text-black border rounded shadow-lg z-10">
               <div
                 className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                 onClick={() => {
@@ -79,10 +79,10 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
             placeholder="Buscar clínica..."
             value={query}
             onChange={handleChange}
-            className="w-full border rounded-full pl-8 pr-4 py-1 text-sm focus:outline-none"
+            className="w-full border rounded-full pl-8 pr-4 py-1 text-sm focus:outline-none text-black"
           />
           <svg
-            className="w-4 h-4 text-gray-500 absolute top-2 left-2.5"
+            className="w-4 h-4 text-gray-800 absolute top-2 left-2.5"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
@@ -97,7 +97,7 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
         </div>
 
         {/* Notificaciones */}
-        <img src="/icono_notificaciones.png" alt="Notificaciones" className="h-8" />
+        {/* <img src="/icono_notificaciones.png" alt="Notificaciones" className="h-8" /> */}
         
         {/* Perfil paciente */}
         <img

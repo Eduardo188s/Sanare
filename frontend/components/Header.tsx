@@ -14,7 +14,7 @@ export function Header() {
     <header className="w-1/2 bg-[#6381A8] text-white py-8 px-6 shadow-md ml-auto">
       <nav className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="text-xl font-bold"></div>
-        <div className="flex gap-4 text-sm">
+        <div className="flex gap-4 text-sm ">
           <Link href="/" className={`rounded-3xl px-5 py-2 text-base font-medium ${
             pathname === '/' ? 'bg-white text-black font-bold' : 'text-white hover:bg-white hover:text-black'}`}>Home</Link>
           

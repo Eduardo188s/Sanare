@@ -34,7 +34,7 @@ export default function NavbarMedico({ hayNuevas }: { hayNuevas?: boolean }) {
             className="flex items-center space-x-1 cursor-pointer"
             onClick={() => setMenuAbierto(!menuAbierto)}
           >
-            <span className="font-semibold">Configuración</span>
+            <span className="font-semibold text-black">Configuración</span>
             <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
@@ -45,7 +45,7 @@ export default function NavbarMedico({ hayNuevas }: { hayNuevas?: boolean }) {
           </div>
 
           {menuAbierto && (
-            <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg z-10">
+            <div className="absolute right-0 mt-2 w-40 text-black bg-white border rounded shadow-lg z-10">
               <div
                 className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                 onClick={() => {
@@ -65,7 +65,7 @@ export default function NavbarMedico({ hayNuevas }: { hayNuevas?: boolean }) {
         </div>
 
         {/* Buscador */}
-        <div className="relative w-48">
+        {/* <div className="relative w-48 text-black">
           <input
             type="text"
             placeholder="Buscar..."
@@ -84,7 +84,7 @@ export default function NavbarMedico({ hayNuevas }: { hayNuevas?: boolean }) {
               d="M21 21l-4.35-4.35M16.65 11.32a5.33 5.33 0 11-10.66 0 5.33 5.33 0 0110.66 0z"
             />
           </svg>
-        </div>
+        </div> */}
 
         {/* Icono de Notificaciones */}
         <div className="relative">

@@ -212,10 +212,10 @@ export default function ClinicaDetalle() {
           )}
 
           <div className="text-left w-full max-w-[600px]">
-            <p className="font-semibold text-lg mb-2">Calificación</p>
+            <p className="font-semibold text-lg mb-2 text-black">Calificación</p>
             <div className="mb-4">
-              <p className="font-medium mb-1">Agregar tu comentario</p>
-              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+              <p className="font-medium mb-1 text-black">Agregar tu comentario</p>
+              <p className='text-black'>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
               <div className="flex items-center gap-1 mb-2">
                 {[...Array(5)].map((_, index) => {
                   const currentRating = index + 1;
@@ -242,13 +242,13 @@ export default function ClinicaDetalle() {
                     </label>
                   );
                 })}
-                <span className="text-sm text-gray-600 ml-2">
+                <span className="text-sm text-black ml-2">
                   {rating} / 5
                 </span>
               </div>
               <input
                 placeholder="Escribe tu comentario..."
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none"
+                className="w-full border border-gray-800 rounded-md px-3 py-2 text-sm focus:outline-none text-black"
               />
             </div>
           </div>
