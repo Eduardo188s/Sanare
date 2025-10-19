@@ -76,7 +76,7 @@ export default function NotificacionesPage() {
         setNotificaciones(data);
 
       } catch (error) {
-        console.error(error);
+        //console.error(error);
         alert('No se pudieron cargar las notificaciones');
       }
     };
@@ -94,7 +94,7 @@ export default function NotificacionesPage() {
       prev.map(n => (n.id === id ? { ...n, leida: true } : n))
     );
   } catch (error) {
-    console.error("Error al marcar como leída:", error);
+    //console.error("Error al marcar como leída:", error);
   }
 };
 
@@ -102,7 +102,7 @@ export default function NotificacionesPage() {
     <main className="min-h-screen bg-gray-100">
       <NavbarMedico/>
       <section className="max-w-4xl mx-auto px-4 py-10">
-        <h2 className="text-2xl font-bold mb-6">Mis notificaciones</h2>
+        <h2 className="text-2xl font-bold mb-6 text-[#6381A8]">Mis notificaciones</h2>
         {notificaciones.length === 0 ? (
           <p className="text-gray-600">No tienes notificaciones.</p>
         ) : (

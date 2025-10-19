@@ -26,6 +26,7 @@ type Clinica = {
   ubicacion: string;
   hora_apertura: string;
   hora_cierre: string;
+  dias_habiles: number[];
   medico_responsable: Medico | null;
 };
 
@@ -46,6 +47,8 @@ export default function ClinicaDetalle() {
     typeof window !== 'undefined'
       ? Number(localStorage.getItem('pacienteId'))
       : null;
+
+  const { accessToken, refreshAccessToken } = useAuth();
 
   useEffect(() => {
     if (!clinicaId) return;
@@ -89,38 +92,36 @@ export default function ClinicaDetalle() {
       .catch((err) => console.error('Error cargando horarios disponibles:', err));
   }, [selectedDate, clinica, clinicaId]);
 
-  const { accessToken, refreshAccessToken } = useAuth();
-
   const fetchConToken = async (url: string, options: RequestInit) => {
-  let token = accessToken;
+    let token = accessToken;
 
-  if (!token) {
-    token = await refreshAccessToken();
     if (!token) {
-      alert('Tu sesión expiró. Por favor, inicia sesión nuevamente.');
-      router.push('/login');
-      return null;
-    }
-  }
-
-  const opciones = { ...options, headers: { ...options.headers, Authorization: `Bearer ${token}` } };
-
-  let response = await fetch(url, opciones);
-
-  if (response.status === 401) {
-    const nuevoToken = await refreshAccessToken();
-    if (!nuevoToken) {
-      alert('Tu sesión expiró. Por favor, inicia sesión nuevamente.');
-      router.push('/login');
-      return null;
+      token = await refreshAccessToken();
+      if (!token) {
+        alert('Tu sesión expiró. Por favor, inicia sesión nuevamente.');
+        router.push('/login');
+        return null;
+      }
     }
 
-    opciones.headers = { ...opciones.headers, Authorization: `Bearer ${nuevoToken}` };
-    response = await fetch(url, opciones);
-  }
+    const opciones = { ...options, headers: { ...options.headers, Authorization: `Bearer ${token}` } };
 
-  return response;
-};
+    let response = await fetch(url, opciones);
+
+    if (response.status === 401) {
+      const nuevoToken = await refreshAccessToken();
+      if (!nuevoToken) {
+        alert('Tu sesión expiró. Por favor, inicia sesión nuevamente.');
+        router.push('/login');
+        return null;
+      }
+
+      opciones.headers = { ...opciones.headers, Authorization: `Bearer ${nuevoToken}` };
+      response = await fetch(url, opciones);
+    }
+
+    return response;
+  };
 
   const agendarCita = async () => {
     let token = accessToken;
@@ -183,12 +184,13 @@ export default function ClinicaDetalle() {
         router.push('/paciente/citas');
       }
     } catch (error: any) {
-      console.error('Error en la solicitud:', error);
       alert(error.message || 'Error de red al agendar cita');
     }
   };
 
   if (!clinica) return <p className="p-4">Cargando clínica...</p>;
+
+  const diasHabiles = clinica?.dias_habiles || [];
 
   return (
     <main className="min-h-screen bg-white">
@@ -212,10 +214,10 @@ export default function ClinicaDetalle() {
           )}
 
           <div className="text-left w-full max-w-[600px]">
-            <p className="font-semibold text-lg mb-2">Calificación</p>
+            <p className="font-semibold text-lg mb-2 text-black">Calificación</p>
             <div className="mb-4">
-              <p className="font-medium mb-1">Agregar tu comentario</p>
-              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+              <p className="font-medium mb-1 text-black">Agregar tu comentario</p>
+              <p className='text-black'>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
               <div className="flex items-center gap-1 mb-2">
                 {[...Array(5)].map((_, index) => {
                   const currentRating = index + 1;
@@ -242,13 +244,13 @@ export default function ClinicaDetalle() {
                     </label>
                   );
                 })}
-                <span className="text-sm text-gray-600 ml-2">
+                <span className="text-sm text-black ml-2">
                   {rating} / 5
                 </span>
               </div>
               <input
                 placeholder="Escribe tu comentario..."
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none"
+                className="w-full border border-gray-800 rounded-md px-3 py-2 text-sm focus:outline-none text-black"
               />
             </div>
           </div>
@@ -274,10 +276,18 @@ export default function ClinicaDetalle() {
             />
           </div>
 
-          <p className="text-blue-700 font-medium mt-4">Selecciona una fecha:</p>
+          <p className="text-bg-[#6381A8] font-medium mt-4">Selecciona una fecha:</p>
           <div className="border rounded-md p-4">
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateCalendar value={selectedDate} onChange={setSelectedDate} />
+              <DateCalendar
+                value={selectedDate}
+                onChange={setSelectedDate}
+                shouldDisableDate={(date: Dayjs) => {
+                  const dia = date.day();
+                  const diaBackend = dia === 0 ? 6 : dia - 1;
+                  return !diasHabiles.includes(diaBackend);
+                }}
+              />
             </LocalizationProvider>
 
             <div className="mt-6">
@@ -295,7 +305,7 @@ export default function ClinicaDetalle() {
             </div>
 
             <button
-              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 w-full"
+              className="mt-4 bg-[#6381A8] hover:bg-[#4f6a8f] text-white px-4 py-2 rounded-2xl w-full"
               onClick={agendarCita}
             >
               Agendar

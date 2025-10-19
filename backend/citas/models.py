@@ -6,6 +6,16 @@ from django.db.models.signals import post_save
 
 User = get_user_model()
 
+DIA_SEMANA_CHOICES = [
+    (0, 'Lunes'),
+    (1, 'Martes'),
+    (2, 'Miércoles'),
+    (3, 'Jueves'),
+    (4, 'Viernes'),
+    (5, 'Sábado'),
+    (6, 'Domingo'),
+]
+
 class Especialidad(models.Model):
     nombre = models.CharField(max_length=100)
 
@@ -21,6 +31,7 @@ class Clinica(models.Model):
     ubicacion = models.CharField(max_length=200)
     hora_apertura = models.TimeField(null=True, blank=True)
     hora_cierre = models.TimeField(null=True, blank=True)
+    dias_habiles = models.JSONField(default=list, blank=True)
     imagen = models.ImageField(upload_to='clinicas/', null=True, blank=True)
     medico_responsable = models.ForeignKey(
         User,
@@ -44,15 +55,18 @@ class Horario(models.Model):
     medico = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='horarios',
+        related_name='horarios_disponibles',
         limit_choices_to={'is_medico': True}
     )
-    dia = models.DateField()
-    hora = models.TimeField()
-    disponible = models.BooleanField(default=True)
+    dia_semana = models.IntegerField(choices=DIA_SEMANA_CHOICES)
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+
+    class Meta:
+        unique_together = ('medico', 'dia_semana')
 
     def __str__(self):
-        return f"{self.medico.get_full_name()} - {self.dia} {self.hora} ({'Disponible' if self.disponible else 'No disponible'})"
+        return f"{self.medico.get_full_name()} - {self.get_dia_semana_display()} {self.hora_inicio}-{self.hora_fin}"
 
 class Cita(models.Model):
     paciente = models.ForeignKey(
@@ -98,3 +112,16 @@ class Notificacion(models.Model):
 
     def __str__(self):
         return f"Notificación para {self.medico.username} - {self.mensaje}"
+    
+@receiver(post_save, sender=Clinica)
+def crear_horarios_para_medico(sender, instance, created, **kwargs):
+    if created and instance.medico_responsable:
+        for dia in instance.dias_habiles:
+            Horario.objects.get_or_create(
+                medico=instance.medico_responsable,
+                dia_semana=dia,
+                defaults={
+                    'hora_inicio': instance.hora_apertura,
+                    'hora_fin': instance.hora_cierre,
+                }
+            )
