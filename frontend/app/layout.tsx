@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import type { ReactNode } from "react";
 import Footer from "@/components/Footer";
-import Header from "@/components/Header";
 import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
@@ -21,7 +20,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body>
         {}
         <AuthProvider>
-          <Header />
+
           {children}
           <Footer />
         </AuthProvider>

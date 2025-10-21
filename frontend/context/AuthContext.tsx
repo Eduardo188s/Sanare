@@ -14,6 +14,7 @@ interface User {
     sexo?: string;
     fecha_nacimiento?: string;
     especialidad?: string;
+    cedula_profesional?: string;
 }
 
 interface AuthContextType {
@@ -46,7 +47,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             try {
                 setUser(JSON.parse(storedUser));
             } catch (e) {
-                console.error("Error parsing user from localStorage:", e);
+                //console.error("Error parsing user from localStorage:", e);
                 logout();
             }
         }
@@ -55,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const login = async (userNameOrEmail: string, password: string) => {
         setLoading(true);
-        console.log("Access Token:", accessToken);
+        //console.log("Access Token:", accessToken);
         try {
             const response = await fetch('http://localhost:8000/api/auth/token/', {
                 method: 'POST',
@@ -84,6 +85,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     sexo: decodedToken.sexo,
                     fecha_nacimiento: decodedToken.fecha_nacimiento,
                     especialidad: decodedToken.especialidad,
+                    cedula_profesional: decodedToken.cedula_profesional,
                 };
                 setUser(userData);
 
@@ -100,16 +102,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 }
 
             } else {
-                console.error('Login failed:', data);
-                throw new Error(data.detail || 'Error de inicio de sesión');
+            let errorDetail = data.detail || 'Credenciales no válidas';
+            
+            const genericCredentialError = 'No active account found with the given credentials.';
+            const drfError = 'Credenciales no válidas';
+            
+            if (errorDetail === genericCredentialError || errorDetail.includes(drfError)) {
+                errorDetail = 'Nombre de usuario/Email o contraseña incorrectos.';
             }
-        } catch (error) {
-            console.error('Error during login:', error);
-            throw error;
-        } finally {
-            setLoading(false);
+
+            throw new Error(errorDetail); 
         }
-    };
+    } catch (error) {
+        
+        const errorMessage = (error as Error).message || 'Error de conexión. Asegúrate de que el servidor esté activo.';
+
+        throw new Error(errorMessage);
+    } finally {
+        setLoading(false);
+    }
+};
 
     const logout = () => {
         setAccessToken(null);
@@ -118,7 +130,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
-        router.push('/login');
+
+        router.replace('/');
     };
 
     const refreshAccessToken = async () => {
@@ -138,12 +151,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 localStorage.setItem('accessToken', data.access);
                 return data.access;
             } else {
-                console.error('Failed to refresh token:', data);
+                //console.error('Failed to refresh token:', data);
                 logout();
                 return null;
             }
         } catch (error) {
-            console.error('Error refreshing token:', error);
+            //console.error('Error refreshing token:', error);
             logout();
             return null;
         }

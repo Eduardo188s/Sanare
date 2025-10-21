@@ -1,0 +1,62 @@
+[
+  {
+    "cedula": "1234567",
+    "nombre": "Juan Pérez López",
+    "especialidad": "Cardiología",
+    "sexo": "M"
+  },
+  {
+    "cedula": "2345678",
+    "nombre": "María Gómez Torres",
+    "especialidad": "Pediatría",
+    "sexo": "F"
+  },
+  {
+    "cedula": "3456789",
+    "nombre": "Carlos Sánchez Ruiz",
+    "especialidad": "Dermatología",
+    "sexo": "M"
+  },
+  {
+    "cedula": "4567890",
+    "nombre": "Ana Martínez Fernández",
+    "especialidad": "Neurología",
+    "sexo": "F"
+  },
+  {
+    "cedula": "5678901",
+    "nombre": "Luis Rodríguez Gómez",
+    "especialidad": "Ortopedia",
+    "sexo": "M"
+  },
+  {
+    "cedula": "6789012",
+    "nombre": "Sofía Hernández Díaz",
+    "especialidad": "Ginecología",
+    "sexo": "F"
+  },
+  {
+    "cedula": "7890123",
+    "nombre": "Miguel Torres Ramírez",
+    "especialidad": "Psiquiatría",
+    "sexo": "M"
+  },
+  {
+    "cedula": "8901234",
+    "nombre": "Laura Flores Morales",
+    "especialidad": "Endocrinología",
+    "sexo": "F"
+  },
+  {
+    "cedula": "9012345",
+    "nombre": "Jorge Jiménez Castro",
+    "especialidad": "Gastroenterología",
+    "sexo": "M"
+  },
+  {
+    "cedula": "0123456",
+    "nombre": "Elena Ruiz Vargas",
+    "especialidad": "Oftalmología",
+    "sexo": "F"
+  }
+]

@@ -1,5 +1,8 @@
 from datetime import date
+import json
+import os
 import re
+from django.conf import settings
 from rest_framework import serializers
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -37,15 +40,39 @@ class RegisterMedicoSerializer(serializers.ModelSerializer):
         fields = [
             'username', 'email', 'password', 'password2',
             'first_name', 'last_name', 'fecha_nacimiento', 'sexo',
-            'telefono', 'especialidad', 'is_medico'
+            'telefono', 'especialidad', 'cedula', 'is_medico'
         ]
         extra_kwargs = {'password': {'write_only': True}}
+
+    def validate_cedula(self, value):
+        import json, os
+        from django.conf import settings
+
+        mock_path = os.path.join(settings.BASE_DIR, 'mock_cedulas.json')
+
+        if not os.path.exists(mock_path):
+            raise serializers.ValidationError("No se pudo validar la cédula profesional (archivo no encontrado).")
+
+        try:
+            with open(mock_path, 'r', encoding='utf-8') as f:
+                cedulas_data = json.load(f)
+        except Exception as e:
+            raise serializers.ValidationError(f"Error al leer el archivo de cédulas: {e}")
+
+        cedula_valida = next((c for c in cedulas_data if str(c["cedula"]) == str(value)), None)
+
+        if not cedula_valida:
+            raise serializers.ValidationError("No se pudo validar la cédula profesional (no encontrada).")
+
+        return value
 
     def validate(self, data):
         if data['password'] != data['password2']:
             raise serializers.ValidationError({"password": "Las contraseñas no coinciden."})
         if not data.get('especialidad'):
             raise serializers.ValidationError({"especialidad": "La especialidad es obligatoria para médicos."})
+        if not data.get('cedula'):
+            raise serializers.ValidationError({"cedula": "La cédula profesional es obligatoria."})
         return data
     
     def validate_first_name(self, value):
@@ -75,6 +102,7 @@ class RegisterMedicoSerializer(serializers.ModelSerializer):
             sexo=validated_data.get('sexo'),
             telefono=validated_data.get('telefono'),
             especialidad=validated_data.get('especialidad'),
+            cedula=validated_data.get('cedula'),
             is_medico=True,
             is_paciente=False,
         )
@@ -142,7 +170,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name',
             'fecha_nacimiento', 'sexo', 'telefono', 'especialidad',
-            'is_medico', 'is_paciente'
+            'cedula', 'is_medico', 'is_paciente'
         ]
         read_only_fields = ['id', 'username', 'email']
 
@@ -179,5 +207,6 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['sexo'] = user.sexo
         token['telefono'] = user.telefono
         token['especialidad'] = user.especialidad if user.is_medico else None
+        token['cedula'] = user.cedula if user.is_medico else None
 
         return token
