@@ -14,6 +14,7 @@ class User(AbstractUser):
     )
     telefono = models.CharField(max_length=15, null=True, blank=True)
     especialidad = models.CharField(max_length=100, null=True, blank=True)
+    cedula = models.CharField(max_length=20, null=True, blank=True, unique=True)
 
     class Meta:
         verbose_name = 'Usuario'

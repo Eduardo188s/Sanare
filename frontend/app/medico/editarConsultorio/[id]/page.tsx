@@ -18,6 +18,16 @@ type FormData = {
     imagen?: File | null;
 };
 
+const DIAS_SEMANA = [
+    { id: 0, nombre: 'Lunes' },
+    { id: 1, nombre: 'Martes' },
+    { id: 2, nombre: 'Miércoles' },
+    { id: 3, nombre: 'Jueves' },
+    { id: 4, nombre: 'Viernes' },
+    { id: 5, nombre: 'Sábado' },
+    { id: 6, nombre: 'Domingo' },
+];
+
 export default function EditConsultorioPage() {
     const { user, loading } = useAuth();
     const router = useRouter();
@@ -32,6 +42,7 @@ export default function EditConsultorioPage() {
         hora_cierre: '17:00',
         imagen: null,
     });
+    const [diasHabiles, setDiasHabiles] = useState<number[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [imagenPreview, setImagenPreview] = useState<string>('/clinica1.jpeg');
@@ -62,6 +73,8 @@ export default function EditConsultorioPage() {
                             imagen: null,
                         });
 
+                        setDiasHabiles(consultorio.dias_habiles || []);
+
                         const imagenURL = consultorio.imagen ? `http://127.0.0.1:8000${consultorio.imagen}` : '/clinica1.jpeg';
                         try {
                             new URL(imagenURL);
@@ -71,7 +84,7 @@ export default function EditConsultorioPage() {
                         }
                     }
                 } catch (err) {
-                    console.error('Error al cargar consultorio existente:', err);
+                    //console.error('Error al cargar consultorio existente:', err);
                     setImagenPreview('/clinica1.jpeg');
                 }
             }
@@ -97,6 +110,12 @@ export default function EditConsultorioPage() {
         }
     };
 
+    const handleDiaChange = (diaId: number) => {
+        setDiasHabiles(prev =>
+            prev.includes(diaId) ? prev.filter(d => d !== diaId) : [...prev, diaId]
+        );
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -110,6 +129,12 @@ export default function EditConsultorioPage() {
 
         if (!consultorioId) {
             setError('No se encontró consultorio para editar.');
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (diasHabiles.length === 0) {
+            setError('Selecciona al menos un día hábil.');
             setIsSubmitting(false);
             return;
         }
@@ -128,6 +153,7 @@ export default function EditConsultorioPage() {
         data.append('ubicacion', formData.ubicacion);
         data.append('hora_apertura', formData.hora_apertura);
         data.append('hora_cierre', formData.hora_cierre);
+        diasHabiles.forEach(dia => data.append('dias_habiles', dia.toString()));
         if (formData.imagen) data.append('imagen', formData.imagen);
 
         try {
@@ -163,7 +189,7 @@ export default function EditConsultorioPage() {
             <NavbarMedico />
             <section>
                 <div className="p-8 mt-10 bg-white text-gray-800 max-w-6xl mx-auto">
-                    <h1 className="text-2xl font-bold mb-6 text-center">Editar Consultorio {id}</h1>
+                    <h1 className="text-2xl font-bold mb-6 text-center">Editar Consultorio</h1>
 
                     {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
@@ -223,6 +249,22 @@ export default function EditConsultorioPage() {
                                     />
                                 </div>
 
+                                <div className="block">
+                                    <label className="block text-sm font-medium mb-1">Días hábiles:</label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {DIAS_SEMANA.map(d => (
+                                            <label key={d.id} className="flex items-center gap-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={diasHabiles.includes(d.id)}
+                                                    onChange={() => handleDiaChange(d.id)}
+                                                />
+                                                {d.nombre}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Médico responsable:</label>
                                     <p className="text-gray-700 font-semibold">{user?.username}</p>
@@ -257,8 +299,8 @@ export default function EditConsultorioPage() {
 
                                 <button
                                     type="submit"
-                                    className={`w-full py-2 px-6 rounded-lg shadow-lg text-sm font-medium text-white transition
-                                        ${isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                                    className={`w-full py-2 px-6 rounded-3xl shadow-lg text-sm font-medium text-white transition
+                                        ${isSubmitting ? 'bg-[#6381A8] cursor-not-allowed' : 'bg-[#6381A8] hover:bg-[#4f6a8f]'}`}
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting ? 'Guardando...' : 'Guardar cambios'}

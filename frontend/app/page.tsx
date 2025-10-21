@@ -1,55 +1,116 @@
-import Image from 'next/image';
+'use client'
+import Header from '@/components/Header';
+import { useState } from 'react';
+import LoginForm from '../components/LoginForm';
+import RegisterForm from '../components/RegisterForm';
 
 export function HomePage() {
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+
+  const handleShowLogin = () => {
+    setShowRegister(false);
+    setShowLogin(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleShowRegister = () => {
+    setShowLogin(false);
+    setShowRegister(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleShowHome = () => {
+    setShowLogin(false);
+    setShowRegister(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <div className="flex min-h-screen"> 
-      <div className="w-1/2 flex items-center justify-center bg-white p-8"> 
-        <div className="text-center">
-          <Image
-            src="/logo_sanare.jpg" 
-            alt="Logo Sanare"
-            width={600} 
-            height={600} 
-            className="rounded-lg max-w-full h-auto" 
-            priority 
-          />
+    <div className="flex flex-col min-h-screen">
+      <Header
+        onHomeClick={handleShowHome}
+        onLoginClick={handleShowLogin}    
+        onRegisterClick={handleShowRegister} 
+      />
+
+      <div
+        className="relative flex flex-col items-center justify-center min-h-screen text-center p-8 pt-20"
+        style={{
+          backgroundImage: "url('/medicos_operando.jpg')",
+          backgroundSize: '100%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          transition: 'background-size 0.5s ease-in-out',
+        }}
+      >
+        <div className="absolute inset-0 bg-[#6381A8] opacity-70"></div>
+        <div className="relative z-10 flex flex-col items-center">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+            Directorio de clínicas y consultorios médicos
+          </h1>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-light text-white mb-12">
+            Encuentra el especialista ideal para ti
+          </h2>
+
+          <div className="flex items-center justify-center min-h-[400px] transition-all duration-500">
+            {showLogin ? (
+              <LoginForm />
+            ) : showRegister ? (
+              <RegisterForm />
+            ) : (
+              <img
+                src="/logo_sanare.jpg"
+                alt="Logo Sanare"
+                width={300}
+                height={100}
+                className="max-w-[300px] h-auto rounded-3xl cursor-pointer"
+              />
+            )}
+          </div>
+
+          <p className="max-w-4xl text-lg text-white mt-12 px-4">
+            Sanare ha sido diseñada para hacer tu experiencia médica más simple, rápida y organizada.
+            Desde esta plataforma podrás agendar tus citas, recibir recordatorios, consultar tu historial
+            y encontrar el profesional de salud adecuado para ti. Nos comprometemos a brindarte una
+            herramienta segura y accesible.
+          </p>
         </div>
       </div>
 
-      <div className="w-1/2 bg-[#6381A8] p-8 flex flex-col"> 
-
-        
-        <div className="flex-grow flex flex-col items-center justify-center text-center p-12 text-white shadow-2xl"> 
-          <h1 className="text-5xl font-light mb-8">Bienvenido</h1>
-          <p className="text-xl text-justify leading-relaxed max-w-2xl">
-            <strong>Sanare</strong> ha sido diseñada para hacer tu experiencia médica más
-            simple, rápida y organizada. Desde esta plataforma podrás agendar
-            tus citas, recibir recordatorios, consultar tu historial y encontrar el
-            profesional de salud adecuado para ti. Nos comprometemos a
-            brindarte una herramienta segura y accesible, para que tú solo te
-            concentres en lo más importante: tu bienestar.
-          </p>
-          <p className="text-xl mt-8">
-            ¡Gracias por confiar en Sanare!
-          </p>
+      {/* Especialidades */}
+      <div className="w-full bg-[#ffffff] text-[#6381A8] py-16 px-4 flex flex-col items-center justify-center text-center">
+        <h2 className="text-4xl font-bold mb-12">
+          Contamos con una amplia gama de especialidades
+        </h2>
+        <div className="flex flex-wrap justify-center gap-4 max-w-5xl mx-auto">
+          {['Angiología','Traumatología','Ginecología','Cardiología','Pediatría','Medicina Interna','Nutrición','Odontología','Dermatología','Psicología','Neurología','Oftalmología','Endocrinología','Fisioterapia'].map((especialidad) => (
+            <span key={especialidad} className="cursor-pointer border border-[#6381A8] rounded-full py-2 px-6 transition-transform duration-300 hover:scale-110 hover:shadow-lg">
+              {especialidad}
+            </span>
+          ))}
         </div>
-        <div className="flex justify-center space-x-6 p-4">
-          {/* Ícono de Facebook */}
-          <a href="#" className="text-white hover:text-gray-200">
-            <svg className="w-8 h-8 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.502 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.262c-1.247 0-1.649.773-1.649 1.574V12h2.775l-.444 2.891h-2.331v6.987C18.343 21.128 22 16.991 22 12c0-5.523-4.477-10-10-10z"/>
-            </svg>
-          </a>
-          <a href="#" className="text-white hover:text-gray-200">
-            <svg className="w-8 h-8 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M22.46 6c-.84.37-1.75.62-2.67.73.96-.58 1.7-1.5 2.04-2.59-.9.53-1.9.92-2.93 1.12-1.01-1.07-2.46-1.7-4.06-1.7-3.08 0-5.58 2.5-5.58 5.58 0 .44.05.87.14 1.28-4.63-.23-8.73-2.45-11.48-5.8c-.48.82-.76 1.77-.76 2.78 0 1.93.98 3.62 2.47 4.63-.91 0-1.76-.28-2.5-.69v.07c0 2.7 1.93 4.95 4.5 5.46-.47.13-.97.2-1.48.2-.36 0-.71-.03-1.06-.1.71 2.23 2.78 3.84 5.23 3.89-1.92 1.5-4.34 2.4-6.97 2.4-.46 0-.91-.03-1.35-.08 2.48 1.59 5.43 2.52 8.59 2.52 10.3 0 15.93-8.54 15.93-15.93 0-.24-.01-.48-.02-.72.95-.69 1.77-1.55 2.42-2.54z"/>
-            </svg>
-          </a>
-          <a href="#" className="text-white hover:text-gray-200">
-            <svg className="w-8 h-8 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 2.163c3.204 0 3.584.012 4.85.07c1.17.057 1.745.288 2.224.477.58.238 1.054.55 1.516 1.015.462.462.778.936 1.016 1.516.189.479.42 1.054.477 2.224.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.057 1.17-.288 1.745-.477 2.224-.238.58-.55 1.054-1.015 1.516-.462.462-.936.778-1.516 1.016-.479.189-1.054.42-2.224.477-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.17-.057-1.745-.288-2.224-.477-.58-.238-1.054-.55-1.516-1.015-.462-.462-.778-.936-1.016-1.516-.189-.479-.42-1.054-.477-2.224-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.057-1.17.288-1.745.477-2.224.238-.58.55-1.054 1.015-1.516.462-.462.936-.778 1.516-1.016.479-.189 1.054-.42 2.224-.477C8.416 2.175 8.796 2.163 12 2.163zm0 1.411c-3.15 0-3.535.012-4.755.068-1.082.052-1.59.264-1.898.388-.36.146-.665.342-.962.639-.297.297-.493.602-.639.962-.124.308-.336.816-.388 1.898-.056 1.22-.068 1.605-.068 4.755s.012 3.535.068 4.755c.052 1.082.264 1.59.388 1.898.146.36.342.665.639.962.297.297.602.493.962.639.308.124.816.336 1.898.388 1.22.056 1.605.068 4.755.068s3.535-.012 4.755-.068c1.082-.052 1.59-.264 1.898-.388.36-.146.665-.342.962-.639.297-.297.493-.602.639-.962.124-.308.336-.816.388-1.898.056-1.22.068-1.605.068-4.755s-.012-3.535-.068-4.755c-.052-1.082-.264-1.59-.388-1.898-.146-.36-.342-.665-.639-.962-.297-.297-.602-.493-.962-.639-.308-.124-.816-.336-1.898-.388C15.535 3.586 15.15 3.574 12 3.574zm0 2.215a5.811 5.811 0 100 11.623 5.811 5.811 0 000-11.623zm0 1.411a4.4 4.4 0 110 8.8 4.4 4.4 0 010-8.8zm6.556-2.617a1.378 1.378 0 100 2.756 1.378 1.378 0 000-2.756z"/>
-            </svg>
-          </a>
+      </div>
+
+      {/* Sección contacto */}
+      <div className="w-full bg-[#6381A8] text-white flex flex-col items-center text-center py-16 px-4">
+        <div className="relative w-full max-w-4xl mx-auto mb-12">
+          <div className="w-full h-64 bg-cover bg-center rounded-lg" style={{ backgroundImage: "url('/image_cirugia.jpg')" }}></div>
+          <div className="absolute inset-0 bg-[#ffffff] rounded-lg flex flex-col justify-center items-center p-8">
+            <button className="bg-[#6281A8] text-[#ffffff] font-bold py-3 px-6 rounded-full mb-8">
+              Contáctanos →
+            </button>
+            <p className="text-gray-600 text-xl leading-relaxed max-w-2xl">
+              Nuestra misión es simplificar el acceso a la atención médica de calidad. Con <b>Sanare</b>, conectamos a pacientes con un directorio de especialistas, haciendo que tu salud sea más fácil de gestionar.
+            </p>
+          </div>
+        </div>
+
+        <div className="w-full border-t border-white mt-8 pt-4 text-center text-sm text-white">
+          <p>
+            © 2025 Sanare. Todos los derechos reservados.
+          </p>
         </div>
       </div>
     </div>

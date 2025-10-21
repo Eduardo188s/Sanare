@@ -86,7 +86,7 @@ export default function CitasPage() {
         const data = await res.json();
         setCitas(data);
       } catch (error) {
-        console.error(error);
+        //console.error(error);
       }
     };
 
@@ -113,7 +113,7 @@ export default function CitasPage() {
         )
       );
     } catch (error) {
-      console.error(error);
+      //console.error(error);
       alert("Ocurrió un error al cancelar la cita");
     }
   };
