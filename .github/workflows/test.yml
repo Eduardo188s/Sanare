@@ -1,6 +1,8 @@
 name: test backend
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
 
 jobs:
   test:
@@ -15,18 +17,35 @@ jobs:
           POSTGRES_PASSWORD: test_pass
         ports:
           - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test_user -d test_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     env:
       DATABASE_URL: postgres://test_user:test_pass@localhost:5432/test_db
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - run: pip install -r backend/requirements.txt
-      - run: |
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip list
+
+      - name: Run Django tests
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+        run: |
           python manage.py migrate
           python manage.py test
-        working-directory: backend
