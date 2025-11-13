@@ -41,6 +41,7 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
           pip list
+          pip install djangorestframework djangorestframework-simplejwt psycopg2-binary
 
       - name: Run Django tests
         working-directory: backend
