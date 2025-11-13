@@ -15,6 +15,7 @@ Jinja2==3.1.6
 dj-database-url
 django-cors-headers
 djangorestframework
+djangorestframework-simplejwt
 MarkupSafe==3.0.2
 narwhals==2.0.1
 nest-asyncio==1.6.0
