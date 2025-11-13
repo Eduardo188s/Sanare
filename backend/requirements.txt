@@ -12,6 +12,7 @@ idna==3.10
 importlib_metadata==8.7.0
 itsdangerous==2.2.0
 Jinja2==3.1.6
+dj-database-url
 MarkupSafe==3.0.2
 narwhals==2.0.1
 nest-asyncio==1.6.0
