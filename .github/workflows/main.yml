@@ -1,0 +1,32 @@
+name: Test Backend
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+        ports:
+          - 5432:5432
+
+    env:
+      DATABASE_URL: postgres://test_user:test_pass@localhost:5432/test_db
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - run: pip install -r backend/requirements.txt
+      - run: |
+          python manage.py migrate
+          python manage.py test
+        working-directory: backend
