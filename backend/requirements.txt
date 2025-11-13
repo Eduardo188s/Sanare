@@ -5,6 +5,7 @@ charset-normalizer==3.4.3
 click==8.2.1
 colorama==0.4.6
 dash==3.2.0
+Pillow
 dash-bootstrap-components==2.0.3
 Django==5.2.6
 Flask==3.1.1
