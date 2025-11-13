@@ -104,6 +104,7 @@ class CitaSerializer(serializers.ModelSerializer):
 class NotificacionSerializer(serializers.ModelSerializer):
     paciente_nombre = serializers.CharField(source="cita.paciente.get_full_name", read_only=True)
     clinica_nombre = serializers.CharField(source="cita.clinica.nombre", read_only=True)
+    clinica = ClinicaSerializer(source="cita.clinica", read_only=True)
     fecha_cita = serializers.DateField(source="cita.fecha", read_only=True)
     hora_cita = serializers.TimeField(source="cita.hora", read_only=True)
 
@@ -111,7 +112,7 @@ class NotificacionSerializer(serializers.ModelSerializer):
         model = Notificacion
         fields = [
             "id", "mensaje", "leida", "fecha_creacion",
-            "paciente_nombre", "fecha_cita", "hora_cita", "clinica_nombre"
+            "paciente_nombre", "fecha_cita", "hora_cita", "clinica_nombre", "clinica"
         ]
 
 class HorarioSerializer(serializers.ModelSerializer):

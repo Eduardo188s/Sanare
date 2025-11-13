@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, ChangeEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface NavbarPacienteProps {
   onSearch?: (term: string) => void;
@@ -11,6 +11,7 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [query, setQuery] = useState('');
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleConsultorioClick = () => {
     router.push('/paciente');
@@ -23,6 +24,7 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
       onSearch(value);
     }
   };
+  const isSearchDisabled = pathname !== "/paciente";
 
   return (
     <nav className="flex items-center justify-between bg-[#6381A8] p-4 border-b rounded-b-2xl border-gray-200 sticky top-0 z-50 w-full">
@@ -43,7 +45,12 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
       placeholder="Buscar clínica"
       value={query}
       onChange={handleChange}
-      className="w-full rounded-full pl-8 pr-4 py-2 text-sm bg-white/20 placeholder-gray-200 text-white focus:outline-none focus:ring-2 focus:ring-white"
+      disabled={isSearchDisabled}
+            className={`w-full rounded-full pl-8 pr-4 py-2 text-sm 
+              ${isSearchDisabled 
+                ? "bg-white/10 text-gray-300 cursor-not-allowed placeholder-gray-400" 
+                : "bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-white"
+              }`}
     />
     <svg
       className="w-4 h-4 text-white absolute top-2.5 left-2.5"

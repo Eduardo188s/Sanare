@@ -4,6 +4,7 @@ import Image from "next/image";
 import NavbarMedico from "../Navbar";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import SideBarMedico from "@/components/SideBarMedico";
 
 
 export default function PerfilMedico() {
@@ -25,9 +26,11 @@ export default function PerfilMedico() {
   }
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-gray-100">
       <NavbarMedico />
-      <div className="min-h-screen bg-gray-50 p-6">
+      <SideBarMedico />
+
+      <section className="flex-1 ml-64 mt-16 p-8">
         <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 flex flex-col md:flex-row justify-between gap-10">
           {/* Columna Izquierda */}
           <div className="flex flex-col gap-6 w-full md:w-2/3">
@@ -43,8 +46,10 @@ export default function PerfilMedico() {
                   height={112}
                   className="object-cover w-full h-full"
                 />
+                
               </div>
               <div>
+                
                 <h2 className="text-xl font-semibold text-gray-800">
                   {user.full_name || user.username}
                 </h2>
@@ -97,7 +102,7 @@ export default function PerfilMedico() {
             </button>
           </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 }

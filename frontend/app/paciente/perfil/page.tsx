@@ -1,10 +1,11 @@
 "use client";
+
 import React, { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import NavbarPaciente from "../NavBar";
-
+import SidebarPaciente from "@/components/SideBarPaciente";
 
 export default function PerfilPaciente() {
   const { user, loading, logout } = useAuth();
@@ -25,15 +26,18 @@ export default function PerfilPaciente() {
   }
 
   return (
-    <main className="min-h-screen bg-white">
-        <NavbarPaciente />
-      <div className="min-h-screen bg-gray-50 p-6">
+    <main className="min-h-screen bg-gray-100">
+      <NavbarPaciente />
+      <SidebarPaciente />
+      {/* Contenido principal */}
+      <section className="flex-1 ml-64 mt-16 p-8">
         <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 flex flex-col md:flex-row justify-between gap-10">
           {/* Columna Izquierda */}
           <div className="flex flex-col gap-6 w-full md:w-2/3">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                            {user.is_medico ? "Médico" : "Paciente"}
-                        </h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">
+              {user.is_medico ? "Médico" : "Paciente"}
+            </h2>
+
             <div className="flex items-center gap-6">
               <div className="w-28 h-28 bg-gray-200 rounded-full overflow-hidden">
                 <Image
@@ -59,17 +63,21 @@ export default function PerfilPaciente() {
               </div>
               <div>
                 <h3 className="text-sm font-bold text-gray-700">Teléfono</h3>
-                <p className="text-sm text-gray-600">{user.telefono}</p>
+                <p className="text-sm text-gray-600">
+                  {user.telefono || "No especificado"}
+                </p>
               </div>
               <div>
                 <h3 className="text-sm font-bold text-gray-700">
                   Fecha de Nacimiento
                 </h3>
-                <p className="text-sm text-gray-600">{user.fecha_nacimiento}</p>
+                <p className="text-sm text-gray-600">
+                  {user.fecha_nacimiento || "No especificada"}
+                </p>
               </div>
               <div>
                 <h3 className="text-sm font-bold text-gray-700">Sexo</h3>
-                <p className="text-sm text-gray-600">{user.sexo}</p>
+                <p className="text-sm text-gray-600">{user.sexo || "—"}</p>
               </div>
             </div>
           </div>
@@ -93,7 +101,7 @@ export default function PerfilPaciente() {
             </button>
           </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 }

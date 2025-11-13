@@ -9,5 +9,5 @@ def crear_notificacion_cita(sender, instance, created, **kwargs):
         Notificacion.objects.create(
     medico=instance.medico,
     cita=instance,
-    mensaje=f"Tienes una nueva cita con {instance.paciente.get_full_name()} el {instance.fecha} a las {instance.hora}"
+    mensaje=f"Tienes una nueva cita con {instance.paciente.get_full_name()}"
 )

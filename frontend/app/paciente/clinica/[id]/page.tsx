@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import NavbarPaciente from '../../NavBar';
-import { FaStar } from 'react-icons/fa';
+import { FaArrowLeft, FaStar } from 'react-icons/fa';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -195,6 +195,18 @@ export default function ClinicaDetalle() {
   return (
     <main className="min-h-screen bg-white">
       <NavbarPaciente />
+
+      <div className="max-w-6xl mx-auto px-4 mt-6">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 px-4 py-2 bg-[#6381A8] border border-gray-200 rounded-full shadow-sm 
+                    hover:bg-[#4f6a8f] hover:text-white hover:shadow-md transition-all duration-200 
+                    text-white font-medium"
+        >
+          <FaArrowLeft className="w-4 h-4" />
+          Volver
+        </button>
+      </div>
 
       <section className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-10">
         {/* Imagen y Calificación */}

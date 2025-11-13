@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Bell } from 'lucide-react';
 
-export default function NavbarMedico({ hayNuevas }: { hayNuevas?: boolean }) {
+export default function NavbarMedico() {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const router = useRouter();
 
@@ -30,21 +30,9 @@ export default function NavbarMedico({ hayNuevas }: { hayNuevas?: boolean }) {
           <span className="text-xs text-white">Directorio de clinicas</span>
         </div>
       </div>
-
-      
-
-<div className="flex items-center space-x-4">
-        <button
-          onClick={handleNotificacionesClick}
-          className="relative p-2 rounded-full hover:bg-white/20 transition-colors duration-200"
-        >
-          <Bell className="w-6 h-6 text-white" />
-          {hayNuevas && (
-            <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-          )}
-        </button>
-  {/* Menú configuración */}
-  <div className="relative">
+        <div className="flex items-center space-x-4">
+    {/* Menú configuración */}
+    <div className="relative">
     <div
       className="flex items-center space-x-1 cursor-pointer"
       onClick={() => setMenuAbierto(!menuAbierto)}

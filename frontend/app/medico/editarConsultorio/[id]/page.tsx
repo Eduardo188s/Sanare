@@ -188,7 +188,28 @@ export default function EditConsultorioPage() {
         <main className="min-h-screen bg-white">
             <NavbarMedico />
             <section>
-                <div className="p-8 mt-10 bg-white text-gray-800 max-w-6xl mx-auto">
+  <div className="p-8 mt-10 bg-white text-gray-800 max-w-6xl mx-auto">
+    {/* 🔙 Botón de volver */}
+    <div className="mb-4">
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 px-4 py-2 bg-[#6381A8] border border-gray-200 rounded-full shadow-sm 
+                  hover:bg-[#4f6a8f] hover:text-white hover:shadow-md transition-all duration-200 
+                  text-white font-medium"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-4 h-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Volver
+      </button>
+    </div>
                     <h1 className="text-2xl font-bold mb-6 text-center">Editar Consultorio</h1>
 
                     {error && <p className="text-red-500 text-center mb-4">{error}</p>}
