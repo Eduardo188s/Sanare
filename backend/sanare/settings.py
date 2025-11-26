@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-*mx6u!0^-dbxhd!z$m$pxz*di3u(-nqstc@$=j65jqd*bx17dm
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -58,6 +58,9 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
+
+CORS_ALLOWED_ALL_ORIGINS = True
+
 ROOT_URLCONF = 'sanare.urls'
 
 TEMPLATES = [
