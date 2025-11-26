@@ -1,13 +1,22 @@
+// Obligatorio para InjectManifest (precache manifest)
+self.__WB_MANIFEST;
+
+// Importaciones necesarias de Workbox
+import { registerRoute } from "workbox-routing";
+import { StaleWhileRevalidate, NetworkFirst } from "workbox-strategies";
+import { ExpirationPlugin } from "workbox-expiration";
+
 self.addEventListener("install", () => {
   console.log("[SW] Instalado");
 });
 
-workbox.routing.registerRoute(
+// Cacheo de páginas del frontend
+registerRoute(
   ({ url }) => url.pathname.startsWith("/paciente/clinicas/"),
-  new workbox.strategies.StaleWhileRevalidate({
+  new StaleWhileRevalidate({
     cacheName: "clinicas-pages",
     plugins: [
-      new workbox.expiration.ExpirationPlugin({
+      new ExpirationPlugin({
         maxEntries: 50,
         maxAgeSeconds: 24 * 60 * 60,
       }),
@@ -15,16 +24,17 @@ workbox.routing.registerRoute(
   })
 );
 
-workbox.routing.registerRoute(
+// Cacheo de API de clínicas
+registerRoute(
   ({ url }) =>
     url.origin === "http://127.0.0.1:8000" &&
     url.pathname.startsWith("/api/clinicas/") &&
     !url.pathname.includes("horarios_disponibles"),
-  new workbox.strategies.NetworkFirst({
+  new NetworkFirst({
     cacheName: "clinicas-api-cache",
     networkTimeoutSeconds: 3,
     plugins: [
-      new workbox.expiration.ExpirationPlugin({
+      new ExpirationPlugin({
         maxEntries: 100,
       }),
     ],
