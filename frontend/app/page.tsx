@@ -1,10 +1,11 @@
 'use client'
+
 import Header from '@/components/Header';
 import { useState } from 'react';
 import LoginForm from '../components/LoginForm';
 import RegisterForm from '../components/RegisterForm';
 
-export function HomePage() {
+export default function HomePage() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
@@ -30,8 +31,8 @@ export function HomePage() {
     <div className="flex flex-col min-h-screen">
       <Header
         onHomeClick={handleShowHome}
-        onLoginClick={handleShowLogin}    
-        onRegisterClick={handleShowRegister} 
+        onLoginClick={handleShowLogin}
+        onRegisterClick={handleShowRegister}
       />
 
       <div
@@ -85,8 +86,16 @@ export function HomePage() {
           Contamos con una amplia gama de especialidades
         </h2>
         <div className="flex flex-wrap justify-center gap-4 max-w-5xl mx-auto">
-          {['Angiología','Traumatología','Ginecología','Cardiología','Pediatría','Medicina Interna','Nutrición','Odontología','Dermatología','Psicología','Neurología','Oftalmología','Endocrinología','Fisioterapia'].map((especialidad) => (
-            <span key={especialidad} className="cursor-pointer border border-[#6381A8] rounded-full py-2 px-6 transition-transform duration-300 hover:scale-110 hover:shadow-lg">
+          {[
+            'Angiología', 'Traumatología', 'Ginecología', 'Cardiología',
+            'Pediatría', 'Medicina Interna', 'Nutrición', 'Odontología',
+            'Dermatología', 'Psicología', 'Neurología', 'Oftalmología',
+            'Endocrinología', 'Fisioterapia'
+          ].map((especialidad) => (
+            <span
+              key={especialidad}
+              className="cursor-pointer border border-[#6381A8] rounded-full py-2 px-6 transition-transform duration-300 hover:scale-110 hover:shadow-lg"
+            >
               {especialidad}
             </span>
           ))}
@@ -96,25 +105,25 @@ export function HomePage() {
       {/* Sección contacto */}
       <div className="w-full bg-[#6381A8] text-white flex flex-col items-center text-center py-16 px-4">
         <div className="relative w-full max-w-4xl mx-auto mb-12">
-          <div className="w-full h-64 bg-cover bg-center rounded-lg" style={{ backgroundImage: "url('/image_cirugia.jpg')" }}></div>
+          <div
+            className="w-full h-64 bg-cover bg-center rounded-lg"
+            style={{ backgroundImage: "url('/image_cirugia.jpg')" }}
+          ></div>
           <div className="absolute inset-0 bg-[#ffffff] rounded-lg flex flex-col justify-center items-center p-8">
             <button className="bg-[#6281A8] text-[#ffffff] font-bold py-3 px-6 rounded-full mb-8">
               Contáctanos →
             </button>
             <p className="text-gray-600 text-xl leading-relaxed max-w-2xl">
-              Nuestra misión es simplificar el acceso a la atención médica de calidad. Con <b>Sanare</b>, conectamos a pacientes con un directorio de especialistas, haciendo que tu salud sea más fácil de gestionar.
+              Nuestra misión es simplificar el acceso a la atención médica de calidad. Con <b>Sanare</b>,
+              conectamos a pacientes con un directorio de especialistas, haciendo que tu salud sea más fácil de gestionar.
             </p>
           </div>
         </div>
 
         <div className="w-full border-t border-white mt-8 pt-4 text-center text-sm text-white">
-          <p>
-            © 2025 Sanare. Todos los derechos reservados.
-          </p>
+          <p>© 2025 Sanare. Todos los derechos reservados.</p>
         </div>
       </div>
     </div>
   );
 }
-
-export default HomePage;
