@@ -30,7 +30,7 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
     <nav className="flex items-center justify-between bg-[#6381A8] p-4 border-b rounded-b-2xl border-gray-200 sticky top-0 z-50 w-full">
       {/* Logo */}
       <div className="flex items-center space-x-2">
-        <img src="/logo_sanare.jpg" alt="Sanare Logo" className="h-10 w-10 rounded-full object-cover"
+        <img src="/icons/logo_sanare.jpg" alt="Sanare Logo" className="h-10 w-10 rounded-full object-cover"
         />
         <div className="flex flex-col">
           <span className="font-bold text-xl text-white">Sanare</span>

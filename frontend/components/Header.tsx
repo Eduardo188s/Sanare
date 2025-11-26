@@ -16,7 +16,7 @@ export function Header({ onHomeClick, onLoginClick, onRegisterClick}: HeaderProp
         <div
         className="flex items-center space-x-2 gap-3 select-none">
           <img 
-            src="/logo_sanare.jpg" 
+            src="/icons/logo_sanare.jpg" 
             alt="Logo Sanare"
             width={60}
             height={50}

@@ -13,26 +13,8 @@ export default function LoginForm() {
     e.preventDefault();
     setError(null);
 
-    try {
-      await login(userNameOrEmail, password);
-    } catch (err: any) {
-      let errorMessage = "Error desconocido al iniciar sesión.";
-      const message = err.message ? err.message.toLowerCase() : "";
-
-      if (message.includes("wrong password") || message.includes("contraseña incorrecta")) {
-        errorMessage = "Contraseña incorrecta. Por favor, inténtalo de nuevo.";
-      } else if (message.includes("user not found") || message.includes("usuario no encontrado")) {
-        errorMessage = "Usuario o correo electrónico no registrado.";
-      } else if (message.includes("invalid email") || message.includes("correo inválido")) {
-        errorMessage = "El formato del correo electrónico es incorrecto.";
-      } else if (message.includes("network error") || message.includes("fallo de red")) {
-        errorMessage = "Error de conexión. Verifica tu conexión a internet.";
-      } else {
-        errorMessage = err.message || errorMessage;
-      }
-
-      setError(errorMessage);
-    }
+    const result = await login(userNameOrEmail, password);
+    if (!result.success) setError(result.message || "Error desconocido al iniciar sesión.");
   };
 
   return (

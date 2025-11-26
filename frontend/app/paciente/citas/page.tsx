@@ -14,6 +14,10 @@ import NavbarPaciente from "../NavBar";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import Modal from "@/components/Modal";
+import ConfirmModal from "@/components/ConfirmModal";
+import { getDB } from "@/utils/db";
+import SidebarPaciente from "@/components/SideBarPaciente";
 
 type Cita = {
   id: number;
@@ -36,6 +40,13 @@ export default function CitasPage() {
   const [citas, setCitas] = useState<Cita[]>([]);
   const [cargando, setCargando] = useState(true);
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalType, setModalType] = useState<"success" | "error" | "warning">("success");
+
   const { accessToken, refreshAccessToken, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -46,7 +57,9 @@ export default function CitasPage() {
     if (!token) {
       token = await refreshAccessToken();
       if (!token) {
-        alert("Tu sesión ha expirado. Inicia sesión nuevamente.");
+        setModalType("warning");
+        setModalMessage("Tu sesión ha expirado. Inicia sesión nuevamente.");
+        setModalOpen(true);
         router.push("/login");
         throw new Error("Sesión expirada");
       }
@@ -64,7 +77,9 @@ export default function CitasPage() {
     if (response.status === 401) {
       token = await refreshAccessToken();
       if (!token) {
-        alert("Tu sesión ha expirado. Inicia sesión nuevamente.");
+        setModalType("warning");
+        setModalMessage("Tu sesión ha expirado. Inicia sesión nuevamente.");
+        setModalOpen(true);
         router.push("/login");
         throw new Error("Sesión expirada");
       }
@@ -98,9 +113,18 @@ export default function CitasPage() {
           );
         }
         const data = await res.json();
+        localStorage.setItem("citas-cache", JSON.stringify(data));
         setCitas(data);
       } catch (error) {
-        // console.error(error);
+        console.warn("No hay conexión. Cargando citas guardadas");
+
+   const cache = localStorage.getItem("citas-cache");
+   if (cache) {
+      const citasCacheadas = JSON.parse(cache);
+      setCitas(citasCacheadas);
+   } else {
+      console.warn("No hay citas en cache.");
+   }
       } finally {
         setCargando(false);
       }
@@ -110,37 +134,73 @@ export default function CitasPage() {
   }, [loading, accessToken, refreshAccessToken, router]);
 
   const cancelarCita = async (id: number) => {
-    const confirmacion = confirm(
-      "¿Estás seguro de que quieres cancelar esta cita?"
-    );
-    if (!confirmacion) return;
-
-    try {
-      const response = await fetchWithAuth(
-        `http://127.0.0.1:8000/api/citas/${id}/cancelar/`,
-        { method: "PATCH" }
-      );
-
-      if (!response.ok) throw new Error("Error al cancelar la cita");
-
-      const data = await response.json();
-      alert(data.mensaje);
-
-      setCitas((prev) =>
-        prev.map((cita) =>
-          cita.id === id ? { ...cita, estado: "Cancelada" } : cita
-        )
-      );
-    } catch (error) {
-      // console.error(error);
-      alert("Ocurrió un error al cancelar la cita");
-    }
+    setConfirmAction(() => () => confirmarCancelacion(id));
+    setConfirmOpen(true);
   };
+
+  const confirmarCancelacion = async (id: number) => {
+    if (!navigator.onLine) {
+
+    const db = await getDB();
+    await db.add("pending", {
+      id: Date.now(),
+      url: `http://127.0.0.1:8000/api/citas/${id}/cancelar/`,
+      method: "PATCH",
+      body: {}
+    });
+
+    navigator.serviceWorker.ready.then((reg) => {
+      reg.sync.register("sync-citas");
+    });
+
+    setModalType("warning");
+    setModalMessage(
+      "La cita se cancelará automáticamente cuando recuperes la conexión."
+    );
+    setModalOpen(true);
+
+    setCitas((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, estado: "Cancelada" } : c))
+    );
+
+    return;
+  }
+
+  try {
+    const response = await fetchWithAuth(
+      `http://127.0.0.1:8000/api/citas/${id}/cancelar/`,
+      { method: "PATCH" }
+    );
+
+    if (!response.ok) {
+      setModalType("error");
+      setModalMessage("No se pudo cancelar la cita.");
+      setModalOpen(true);
+      return;
+    }
+
+    const data = await response.json();
+
+    setModalType("success");
+    setModalMessage(data.mensaje || "La cita ha sido cancelada.");
+    setModalOpen(true);
+
+    setCitas((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, estado: "Cancelada" } : c))
+    );
+  } catch {
+    setModalType("error");
+    setModalMessage("Error al cancelar la cita.");
+    setModalOpen(true);
+  }
+};
+
 
   return (
     <main className="flex flex-col min-h-screen bg-gray-100">
       {/* Navbar fijo */}
       <NavbarPaciente />
+      <SidebarPaciente />
 
       <div className="flex flex-1">
         {/* Sidebar de navegación */}
@@ -290,6 +350,21 @@ export default function CitasPage() {
           )}
         </section>
       </div>
+      <ConfirmModal
+  open={confirmOpen}
+  message="¿Estás seguro de que quieres cancelar esta cita?"
+  onCancel={() => setConfirmOpen(false)}
+  onConfirm={() => {
+    setConfirmOpen(false);
+    confirmAction();
+  }}
+/>
+      <Modal
+        open={modalOpen}
+        type={modalType}
+        message={modalMessage}
+        onClose={() => setModalOpen(false)}
+      />
     </main>
   );
 }

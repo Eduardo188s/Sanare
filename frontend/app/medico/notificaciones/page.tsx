@@ -110,14 +110,12 @@ export default function NotificacionesPage() {
       <NavbarMedico />
       <SideBarMedico />
 
-      {/* 🔹 Contenido principal */}
       <section className="flex-1 ml-64 mt-16 px-6 py-10 overflow-y-auto">
         <div className="max-w-5xl mx-auto space-y-6">
           <h2 className="text-gray-800 text-2xl font-bold mb-6">
             Mis notificaciones
           </h2>
 
-          {/* 🔸 Pantalla de carga centrada (sin ocultar Navbar ni Sidebar) */}
           {isLoading ? (
             <div className="flex justify-center items-center min-h-[60vh]">
               <div className="flex flex-col items-center">

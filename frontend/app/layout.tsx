@@ -3,6 +3,7 @@ import "./globals.css";
 import type { ReactNode } from "react";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
+import RegisterSW from "@/components/RegisterSW"; // ⬅ IMPORTANTE
 
 export const metadata: Metadata = {
   title: "Sanare",
@@ -17,10 +18,10 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
+      <link rel="manifest" href="/manifest.json" />
       <body>
-        {}
         <AuthProvider>
-
+          <RegisterSW />
           {children}
           <Footer />
         </AuthProvider>

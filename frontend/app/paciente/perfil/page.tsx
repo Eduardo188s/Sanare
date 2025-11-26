@@ -41,7 +41,7 @@ export default function PerfilPaciente() {
             <div className="flex items-center gap-6">
               <div className="w-28 h-28 bg-gray-200 rounded-full overflow-hidden">
                 <Image
-                  src="/logo_sanare.jpg"
+                  src="/icons/logo_sanare.jpg"
                   alt="Foto Perfil"
                   width={112}
                   height={112}

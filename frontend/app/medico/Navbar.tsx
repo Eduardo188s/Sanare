@@ -21,7 +21,7 @@ export default function NavbarMedico() {
       {/* Logo y texto */}
       <div className="flex items-center space-x-2">
         <img
-          src="/logo_sanare.jpg"
+          src="/icons/logo_sanare.jpg"
           alt="Sanare Logo"
           className="h-10 w-10 rounded-full object-cover"
         />

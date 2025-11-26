@@ -11,6 +11,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import dayjs, { Dayjs } from 'dayjs';
 import { useAuth } from '@/context/AuthContext';
+import Modal from '@/components/Modal';
+import { queueRequest } from '@/utils/offlineQueue';
+import SideBarPaciente from '@/components/SideBarPaciente';
 
 type Medico = {
   id: number;
@@ -30,10 +33,50 @@ type Clinica = {
   medico_responsable: Medico | null;
 };
 
+type Comentario = {
+  id: number;
+  nombre: string;
+  rating: number;
+  comentario: string;
+};
+
+async function fetchHorariosSafe(url: string) {
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    return { ok: false, offline: true, data: null };
+  }
+
+  try {
+    const response = await fetch(url, { cache: 'no-store' });
+
+    if (!response.ok) {
+      const text = await response.text().catch(() => null);
+      console.error('Error HTTP al obtener horarios:', response.status, text);
+      return { ok: false, error: response.status, data: null };
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const text = await response.text().catch(() => null);
+      console.error('Respuesta no JSON al pedir horarios:', text);
+      return { ok: false, error: 'not_json', data: null };
+    }
+
+    const data = await response.json();
+    return { ok: true, data };
+  } catch (err) {
+    console.error('Error de red al obtener horarios:', err);
+    return { ok: false, error: 'network_error', data: null };
+  }
+}
+
 export default function ClinicaDetalle() {
   const router = useRouter();
   const params = useParams();
   const clinicaId = Number(params?.id);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalType, setModalType] = useState<'success' | 'error' | 'warning'>('success');
 
   const [clinica, setClinica] = useState<Clinica | null>(null);
   const [horarios, setHorarios] = useState<string[]>([]);
@@ -42,13 +85,50 @@ export default function ClinicaDetalle() {
   const [rating, setRating] = useState<number | null>(5);
   const [hover, setHover] = useState<number | null>(null);
   const [motivo, setMotivo] = useState('');
+  const [comentario, setComentario] = useState('');
+
+  const [isOnline, setIsOnline] = useState<boolean>(true);
 
   const pacienteId =
-    typeof window !== 'undefined'
-      ? Number(localStorage.getItem('pacienteId'))
-      : null;
+    typeof window !== 'undefined' ? Number(localStorage.getItem('pacienteId')) : null;
 
   const { accessToken, refreshAccessToken } = useAuth();
+
+  const [comentarios, setComentarios] = useState<Comentario[]>([
+    { id: 1, nombre: 'Juan Pérez.', rating: 5, comentario: 'Excelente servicio' },
+    { id: 2, nombre: 'María López.', rating: 4, comentario: 'Muy buena atención' },
+    { id: 3, nombre: 'Carlos García.', rating: 5, comentario: 'Muy profesional' },
+  ]);
+
+  const [nombrePaciente, setNombrePaciente] = useState('Paciente Anónimo');
+
+  useEffect(() => {
+    const nombre = localStorage.getItem('nombrePaciente');
+    if (nombre) setNombrePaciente(nombre);
+  }, []);
+
+  useEffect(() => {
+    const onOnline = () => setIsOnline(true);
+    const onOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', onOnline);
+    window.addEventListener('offline', onOffline);
+
+    setIsOnline(typeof navigator !== 'undefined' ? navigator.onLine : true);
+
+    if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.ready
+        .then((reg) => {
+          console.log('Service worker listo', reg);
+        })
+        .catch((err) => console.warn('Service worker no listo:', err));
+    }
+
+    return () => {
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('offline', onOffline);
+    };
+  }, []);
 
   useEffect(() => {
     if (!clinicaId) return;
@@ -75,21 +155,43 @@ export default function ClinicaDetalle() {
   };
 
   useEffect(() => {
-    if (!selectedDate || !clinica?.medico_responsable) return;
+    let mounted = true;
+    async function loadHorarios() {
+      if (!selectedDate || !clinica?.medico_responsable) return;
 
-    const fecha = selectedDate.format('YYYY-MM-DD');
+      const fecha = selectedDate.format('YYYY-MM-DD');
+      const url = `http://127.0.0.1:8000/api/clinicas/${clinicaId}/horarios_disponibles/?fecha=${fecha}`;
 
-    fetch(`http://127.0.0.1:8000/api/clinicas/${clinicaId}/horarios_disponibles/?fecha=${fecha}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const horariosFiltrados = filtrarHorariosPorRango(
-          data,
-          clinica.hora_apertura,
-          clinica.hora_cierre
-        );
-        setHorarios(horariosFiltrados);
-      })
-      .catch((err) => console.error('Error cargando horarios disponibles:', err));
+      const result = await fetchHorariosSafe(url);
+
+      if (!mounted) return;
+
+      if (result.offline) {
+        setHorarios([]);
+        console.warn('Off-line: no se cargaron horarios en tiempo real');
+        return;
+      }
+
+      if (!result.ok) {
+        console.error('Error cargando horarios disponibles:', result.error);
+        setHorarios([]);
+        return;
+      }
+
+      const horariosFiltrados = filtrarHorariosPorRango(
+        result.data || [],
+        clinica.hora_apertura,
+        clinica.hora_cierre
+      );
+
+      setHorarios(horariosFiltrados);
+    }
+
+    loadHorarios();
+
+    return () => {
+      mounted = false;
+    };
   }, [selectedDate, clinica, clinicaId]);
 
   const fetchConToken = async (url: string, options: RequestInit) => {
@@ -98,20 +200,23 @@ export default function ClinicaDetalle() {
     if (!token) {
       token = await refreshAccessToken();
       if (!token) {
-        alert('Tu sesión expiró. Por favor, inicia sesión nuevamente.');
+        setModalType('warning');
+        setModalMessage('Tu sesión expiró. Por favor, inicia sesión nuevamente.');
+        setModalOpen(true);
         router.push('/login');
         return null;
       }
     }
 
     const opciones = { ...options, headers: { ...options.headers, Authorization: `Bearer ${token}` } };
-
     let response = await fetch(url, opciones);
 
     if (response.status === 401) {
       const nuevoToken = await refreshAccessToken();
       if (!nuevoToken) {
-        alert('Tu sesión expiró. Por favor, inicia sesión nuevamente.');
+        setModalType('warning');
+        setModalMessage('Tu sesión expiró. Por favor, inicia sesión nuevamente.');
+        setModalOpen(true);
         router.push('/login');
         return null;
       }
@@ -129,14 +234,18 @@ export default function ClinicaDetalle() {
     if (!token) {
       token = await refreshAccessToken();
       if (!token) {
-        alert('Debes iniciar sesión para agendar una cita');
+        setModalType('warning');
+        setModalMessage('Debes iniciar sesión para agendar una cita.');
+        setModalOpen(true);
         router.push('/login');
         return;
       }
     }
 
     if (!selectedDate || !selectedHour) {
-      alert('Selecciona una fecha y un horario.');
+      setModalType('warning');
+      setModalMessage('Selecciona una fecha y un horario.');
+      setModalOpen(true);
       return;
     }
 
@@ -146,12 +255,16 @@ export default function ClinicaDetalle() {
       .minute(Number(selectedHour.split(':')[1]));
 
     if (fechaSeleccionada.isBefore(ahora)) {
-      alert('Selecciona una fecha y hora válidas');
+      setModalType('warning');
+      setModalMessage('Selecciona una fecha y hora válidas.');
+      setModalOpen(true);
       return;
     }
 
     if (!clinica?.medico_responsable) {
-      alert('No hay médico asignado a esta clínica.');
+      setModalType('error');
+      setModalMessage('No hay médico asignado a esta clínica.');
+      setModalOpen(true);
       return;
     }
 
@@ -167,7 +280,7 @@ export default function ClinicaDetalle() {
             medico_id: clinica.medico_responsable.id,
             fecha: selectedDate.format('YYYY-MM-DD'),
             hora: selectedHour,
-            motivo: motivo || 'Consulta general'
+            motivo: motivo || 'Consulta general',
           }),
         }
       );
@@ -175,20 +288,82 @@ export default function ClinicaDetalle() {
       if (!response) return;
 
       if (response.ok) {
-        alert('Cita agendada correctamente');
-        router.push('/paciente/citas');
+        setModalType('success');
+        setModalMessage('Cita agendada correctamente.');
+        setModalOpen(true);
+
+        setTimeout(() => {
+          router.push('/paciente/citas');
+        }, 1200);
+
       } else {
-        const errorData = await response.json();
-        const mensaje = errorData?.error || errorData?.detail || 'Ocurrió un error al agendar la cita';
-        alert(mensaje);
-        router.push('/paciente/citas');
+        let errorData: any = null;
+        try {
+          errorData = await response.json();
+        } catch (err) {
+          console.error('Respuesta no JSON:', err);
+        }
+
+        setModalType('error');
+        setModalMessage(
+          errorData?.error || errorData?.detail || 'Ocurrió un error inesperado al agendar la cita.'
+        );
+        setModalOpen(true);
       }
-    } catch (error: any) {
-      alert(error.message || 'Error de red al agendar cita');
+    } catch (error) {
+      await queueRequest({
+        url: `http://127.0.0.1:8000/api/medicos/${clinica?.medico_responsable?.id}/agendar-cita/`,
+        method: 'POST',
+        body: {
+          paciente_id: pacienteId || 1,
+          clinica_id: clinicaId,
+          medico_id: clinica?.medico_responsable?.id,
+          fecha: selectedDate.format('YYYY-MM-DD'),
+          hora: selectedHour,
+          motivo: motivo || 'Consulta general',
+        },
+      });
+
+      if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then((reg: any) => {
+          if ('sync' in reg) {
+            reg.sync.register('sync-citas').catch((e: any) => console.warn('Sync register failed:', e));
+          }
+        }).catch((e) => console.warn('Service worker ready error:', e));
+      }
+
+      setModalType('warning');
+      setModalMessage('No tienes conexión. La cita se enviará automáticamente cuando vuelva la red.');
+      setModalOpen(true);
+
+      return;
     }
   };
 
-  if (!clinica) return <p className="p-4">Cargando clínica...</p>;
+  const publicarComentario = () => {
+    if (!rating || comentario.trim() === '') {
+      setModalType('warning');
+      setModalMessage('Debes agregar una calificación y un comentario.');
+      setModalOpen(true);
+      return;
+    }
+
+    const nuevoComentario: Comentario = {
+      id: Date.now(),
+      nombre: nombrePaciente,
+      rating,
+      comentario,
+    };
+
+    setComentarios([nuevoComentario, ...comentarios]);
+    setComentario('');
+  };
+
+  if (!clinica) {
+    return (
+      <div className="p-6 text-white">Cargando clínica...</div>
+    );
+  }
 
   const diasHabiles = clinica?.dias_habiles || [];
 
@@ -200,8 +375,8 @@ export default function ClinicaDetalle() {
         <button
           onClick={() => router.back()}
           className="flex items-center gap-2 px-4 py-2 bg-[#6381A8] border border-gray-200 rounded-full shadow-sm 
-                    hover:bg-[#4f6a8f] hover:text-white hover:shadow-md transition-all duration-200 
-                    text-white font-medium"
+                      hover:bg-[#4f6a8f] hover:text-white hover:shadow-md transition-all duration-200 
+                      text-white font-medium"
         >
           <FaArrowLeft className="w-4 h-4" />
           Volver
@@ -209,8 +384,9 @@ export default function ClinicaDetalle() {
       </div>
 
       <section className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* Imagen y Calificación */}
+
         <div className="flex flex-col items-start">
+
           {clinica.imagen ? (
             <Image
               src={clinica.imagen}
@@ -220,16 +396,14 @@ export default function ClinicaDetalle() {
               className="rounded-lg object-cover mb-6"
             />
           ) : (
-            <div className="w-full h-[400px] bg-gray-200 mb-6 rounded-lg flex items-center justify-center">
-              Sin imagen
-            </div>
+            <div className="w-full h-[400px] bg-gray-200 mb-6 rounded-lg flex items-center justify-center">Sin imagen</div>
           )}
 
+          {/* ESTRELLAS + COMENTARIOS */}
           <div className="text-left w-full max-w-[600px]">
             <p className="font-semibold text-lg mb-2 text-black">Calificación</p>
+
             <div className="mb-4">
-              <p className="font-medium mb-1 text-black">Agregar tu comentario</p>
-              <p className='text-black'>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
               <div className="flex items-center gap-1 mb-2">
                 {[...Array(5)].map((_, index) => {
                   const currentRating = index + 1;
@@ -256,19 +430,49 @@ export default function ClinicaDetalle() {
                     </label>
                   );
                 })}
-                <span className="text-sm text-black ml-2">
-                  {rating} / 5
-                </span>
+                <span className="text-sm text-black ml-2">{rating} / 5</span>
               </div>
+
+              <p className="font-medium mb-1 text-black">Agregar tu comentario</p>
               <input
+                value={comentario}
+                onChange={(e) => setComentario(e.target.value)}
                 placeholder="Escribe tu comentario..."
                 className="w-full border border-gray-800 rounded-md px-3 py-2 text-sm focus:outline-none text-black"
               />
+
+              <button
+                onClick={publicarComentario}
+                className="mt-3 bg-[#6381A8] text-white px-4 py-2 rounded-lg hover:bg-[#4f6a8f]"
+              >
+                Publicar
+              </button>
+            </div>
+
+            <div className="mt-6">
+              <p className="font-semibold text-lg mb-3 text-black">Comentarios</p>
+
+              {comentarios.map((c) => (
+                <div key={c.id} className="border-b py-3">
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar
+                        key={i}
+                        size={16}
+                        color={i < c.rating ? '#ffc107' : '#e4e5e9'}
+                      />
+                    ))}
+                  </div>
+
+                  <p className="font-medium text-black mt-1">{c.nombre}</p>
+                  <p className="text-sm text-gray-700">{c.comentario}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Calendario y disponibilidad */}
+        {/* DERECHA */}
         <div className="flex flex-col gap-4 text-gray-800">
           <h2 className="text-2xl font-bold">{clinica.nombre}</h2>
           <p><strong>Descripción:</strong> {clinica.descripcion || 'Sin descripción'}</p>
@@ -276,7 +480,6 @@ export default function ClinicaDetalle() {
           <p><strong>Especialidad:</strong> {clinica.medico_responsable?.especialidad_nombre || 'No especificada'}</p>
           <p><strong>Médico responsable:</strong> {clinica.medico_responsable?.full_name || 'No especificado'}</p>
 
-          {/* Motivo de la cita */}
           <div className="mt-4">
             <p className="font-medium text-sm mb-2">Motivo de la cita:</p>
             <textarea
@@ -288,7 +491,7 @@ export default function ClinicaDetalle() {
             />
           </div>
 
-          <p className="text-bg-[#6381A8] font-medium mt-4">Selecciona una fecha:</p>
+          <p className="font-medium mt-4">Selecciona una fecha:</p>
           <div className="border rounded-md p-4">
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateCalendar
@@ -324,7 +527,15 @@ export default function ClinicaDetalle() {
             </button>
           </div>
         </div>
+
       </section>
+
+      <Modal
+        open={modalOpen}
+        type={modalType}
+        message={modalMessage}
+        onClose={() => setModalOpen(false)}
+      />
     </main>
   );
 }

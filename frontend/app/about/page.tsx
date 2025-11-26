@@ -7,7 +7,7 @@ return (
           <div className="w-1/2 flex items-center justify-center bg-white p-8"> 
             <div className="text-center">
               <Image
-                src="/logo_sanare.jpg" 
+                src="/icons/logo_sanare.jpg" 
                 alt="Logo Sanare"
                 width={600} 
                 height={600} 
@@ -20,7 +20,7 @@ return (
           <div className="w-1/2 bg-[#6381A8] p-8 flex flex-col"> 
 
         
-        <div className="flex-grow flex flex-col items-center justify-center text-center p-12 text-white shadow-2xl"> 
+        <div className="grow flex flex-col items-center justify-center text-center p-12 text-white shadow-2xl"> 
           <h1 className="text-5xl font-light mb-8">¿Quienes somos?</h1>
           <p className="text-xl text-justify leading-relaxed max-w-2xl">
             En <strong>Sanare</strong>, creemos que la salud debe ser accesible, organizada y sin complicaciones.

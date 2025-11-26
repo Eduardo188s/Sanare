@@ -61,7 +61,7 @@ export function HomePage() {
               <RegisterForm />
             ) : (
               <img
-                src="/logo_sanare.jpg"
+                src="/icons/logo_sanare.jpg"
                 alt="Logo Sanare"
                 width={300}
                 height={100}

@@ -1,0 +1,21 @@
+{
+  "name": "Sanare",
+  "short_name": "Sanare",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#317773",
+  "icons": [
+    {
+      "src": "/icons/sanare_192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/sanare_512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
