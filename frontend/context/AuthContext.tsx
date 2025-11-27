@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     setLoading(true);
     try {
-      const fetchUrl = `${API_URL}/token/`;
+      const fetchUrl = `${API_URL}/auth/token/`;
       console.log("Intentando conectar con:", fetchUrl);
 
       const response = await fetch(fetchUrl, {
@@ -153,7 +153,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!API_URL || !refreshToken) return null;
 
     try {
-      const response = await fetch(`${API_URL}/token/refresh/`, {
+      const response = await fetch(`${API_URL}/auth/token/refresh/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refresh: refreshToken }),
