@@ -57,7 +57,7 @@ export default function EditConsultorioPage() {
             if (user?.is_medico) {
                 try {
                     const accessToken = localStorage.getItem('accessToken');
-                    const response = await axios.get('http://127.0.0.1:8000/api/clinicas/', {
+                    const response = await axios.get('https://sanarebackend-production.up.railway.app/api/clinicas/', {
                         headers: { Authorization: `Bearer ${accessToken}` },
                     });
                     const misClinicas = response.data.filter((c: any) => c.medico_responsable?.id === user.id);
@@ -157,7 +157,7 @@ export default function EditConsultorioPage() {
         if (formData.imagen) data.append('imagen', formData.imagen);
 
         try {
-            const response = await axios.put(`http://127.0.0.1:8000/api/clinicas/${consultorioId}/`, data, {
+            const response = await axios.put(`https://sanarebackend-production.up.railway.app/api/clinicas/${consultorioId}/`, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${accessToken}`,

@@ -78,7 +78,7 @@ export default function NotificacionesPage() {
 
     const obtenerNotificaciones = async () => {
       try {
-        const res = await fetchWithAuth("http://127.0.0.1:8000/api/notificaciones/my/");
+        const res = await fetchWithAuth("https://sanarebackend-production.up.railway.app/api/notificaciones/my/");
         if (!res.ok) throw new Error("Error al obtener las notificaciones");
         const data = await res.json();
         setNotificaciones(data);
@@ -94,7 +94,7 @@ export default function NotificacionesPage() {
 
   const marcarComoLeida = async (id: number) => {
     try {
-      await fetchWithAuth(`http://127.0.0.1:8000/api/notificaciones/${id}/leer/`, {
+      await fetchWithAuth(`https://sanarebackend-production.up.railway.app/api/notificaciones/${id}/leer/`, {
         method: "PATCH",
       });
       setNotificaciones((prev) =>

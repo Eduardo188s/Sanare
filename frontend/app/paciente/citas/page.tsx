@@ -103,7 +103,7 @@ export default function CitasPage() {
     const obtenerCitas = async () => {
       try {
         setCargando(true);
-        const res = await fetchWithAuth("http://127.0.0.1:8000/api/citas/my/");
+        const res = await fetchWithAuth("https://sanarebackend-production.up.railway.app/api/citas/my/");
         if (!res.ok) {
           const errorData = await res.json();
           throw new Error(
@@ -144,7 +144,7 @@ export default function CitasPage() {
     const db = await getDB();
     await db.add("pending", {
       id: Date.now(),
-      url: `http://127.0.0.1:8000/api/citas/${id}/cancelar/`,
+      url: `https://sanarebackend-production.up.railway.app/api/citas/${id}/cancelar/`,
       method: "PATCH",
       body: {}
     });
@@ -168,7 +168,7 @@ export default function CitasPage() {
 
   try {
     const response = await fetchWithAuth(
-      `http://127.0.0.1:8000/api/citas/${id}/cancelar/`,
+      `https://sanarebackend-production.up.railway.app/api/citas/${id}/cancelar/`,
       { method: "PATCH" }
     );
 

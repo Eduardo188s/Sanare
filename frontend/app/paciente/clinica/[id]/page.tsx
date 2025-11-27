@@ -133,7 +133,7 @@ export default function ClinicaDetalle() {
   useEffect(() => {
     if (!clinicaId) return;
 
-    fetch(`http://127.0.0.1:8000/api/clinicas/${clinicaId}/`)
+    fetch(`https://sanarebackend-production.up.railway.app/api/clinicas/${clinicaId}/`)
       .then((res) => res.json())
       .then((data) => setClinica(data))
       .catch((err) => console.error('Error al cargar la clínica:', err));
@@ -160,7 +160,7 @@ export default function ClinicaDetalle() {
       if (!selectedDate || !clinica?.medico_responsable) return;
 
       const fecha = selectedDate.format('YYYY-MM-DD');
-      const url = `http://127.0.0.1:8000/api/clinicas/${clinicaId}/horarios_disponibles/?fecha=${fecha}`;
+      const url = `https://sanarebackend-production.up.railway.app/api/clinicas/${clinicaId}/horarios_disponibles/?fecha=${fecha}`;
 
       const result = await fetchHorariosSafe(url);
 
@@ -270,7 +270,7 @@ export default function ClinicaDetalle() {
 
     try {
       const response = await fetchConToken(
-        `http://127.0.0.1:8000/api/medicos/${clinica.medico_responsable.id}/agendar-cita/`,
+        `https://sanarebackend-production.up.railway.app/api/medicos/${clinica.medico_responsable.id}/agendar-cita/`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -312,7 +312,7 @@ export default function ClinicaDetalle() {
       }
     } catch (error) {
       await queueRequest({
-        url: `http://127.0.0.1:8000/api/medicos/${clinica?.medico_responsable?.id}/agendar-cita/`,
+        url: `https://sanarebackend-production.up.railway.app/api/medicos/${clinica?.medico_responsable?.id}/agendar-cita/`,
         method: 'POST',
         body: {
           paciente_id: pacienteId || 1,

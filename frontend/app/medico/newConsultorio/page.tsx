@@ -54,7 +54,7 @@
                 if (user?.is_medico) {
                     try {
                         const accessToken = localStorage.getItem('accessToken');
-                        const response = await axios.get('http://127.0.0.1:8000/api/clinicas/', {
+                        const response = await axios.get('https://sanarebackend-production.up.railway.app/api/clinicas/', {
                             headers: {
                                 Authorization: `Bearer ${accessToken}`
                             }
@@ -130,7 +130,7 @@
             if (formData.imagen) data.append('imagen', formData.imagen);
 
             try {
-                const response = await axios.post('http://127.0.0.1:8000/api/clinicas/', data, {
+                const response = await axios.post('https://sanarebackend-production.up.railway.app/api/clinicas/', data, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         Authorization: `Bearer ${accessToken}`

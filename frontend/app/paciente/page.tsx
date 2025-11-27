@@ -45,7 +45,7 @@ export default function PacienteDashboard() {
   }, [user, loading, router]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/clinicas/")
+    fetch("https://sanarebackend-production.up.railway.app/api/clinicas/")
       .then((res) => res.json())
       .then((data) => {
         const clinicasConDatosSimulados = data.map((c: Clinica) => ({
