@@ -1,7 +1,6 @@
-// Obligatorio para InjectManifest (precache manifest)
+// Obligatorio para InjectManifest
 self.__WB_MANIFEST;
 
-// Importaciones necesarias de Workbox
 import { registerRoute } from "workbox-routing";
 import { StaleWhileRevalidate, NetworkFirst } from "workbox-strategies";
 import { ExpirationPlugin } from "workbox-expiration";
@@ -10,7 +9,22 @@ self.addEventListener("install", () => {
   console.log("[SW] Instalado");
 });
 
-// Cacheo de páginas del frontend
+// ⭐ NUEVO: Cachear inicio y páginas principales cuando está offline
+registerRoute(
+  ({ request }) => request.mode === "navigate",
+  new NetworkFirst({
+    cacheName: "pages-cache",
+    networkTimeoutSeconds: 3,
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 50,
+        maxAgeSeconds: 7 * 24 * 60 * 60,
+      }),
+    ],
+  })
+);
+
+// Cacheo de páginas de clínicas
 registerRoute(
   ({ url }) => url.pathname.startsWith("/paciente/clinicas/"),
   new StaleWhileRevalidate({
@@ -24,10 +38,10 @@ registerRoute(
   })
 );
 
-// Cacheo de API de clínicas
+// Cacheo de API
 registerRoute(
   ({ url }) =>
-    url.origin === "http://127.0.0.1:8000" &&
+    url.origin === "https://sanarebackend-production.up.railway.app" &&
     url.pathname.startsWith("/api/clinicas/") &&
     !url.pathname.includes("horarios_disponibles"),
   new NetworkFirst({
