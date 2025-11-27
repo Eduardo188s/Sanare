@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("/service-worker.js")
+      .register("/custom-sw.js")
       .then(() => console.log("Service Worker registrado"))
       .catch(err => console.error("Error registrando SW:", err));
   }
