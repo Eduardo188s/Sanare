@@ -29,8 +29,8 @@ interface AuthContextType {
 
 const SECRET_KEY = "clave_123";
 
-// Tomamos la URL del backend desde la variable de entorno
-const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, ""); // quitar barra final
+// URL del backend desde .env
+const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -56,6 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // Cargar tokens y usuario del localStorage
   useEffect(() => {
     const storedAccessToken = localStorage.getItem("accessToken");
     const storedRefreshToken = localStorage.getItem("refreshToken");
@@ -72,13 +73,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   }, []);
 
+  // LOGIN
   const login = async (userNameOrEmail: string, password: string) => {
     if (!API_URL)
       return { success: false, message: "La URL del backend no está definida." };
 
     setLoading(true);
     try {
-      const fetchUrl = `${API_URL}/auth/token/`;
+      const fetchUrl = `${API_URL}/token/`;
       console.log("Intentando conectar con:", fetchUrl);
 
       const response = await fetch(fetchUrl, {
@@ -87,23 +89,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         body: JSON.stringify({ username: userNameOrEmail, password }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        let errorDetail = data.detail || "Credenciales no válidas";
-        if (
-          errorDetail.includes("No active account") ||
-          errorDetail.includes("Credenciales no válidas")
-        ) {
+        const errorData = await response.json().catch(() => ({}));
+        let errorDetail = errorData.detail || "Credenciales no válidas";
+        if (errorDetail.includes("No active account")) {
           errorDetail = "Nombre de usuario o contraseña incorrectos.";
         }
         return { success: false, message: errorDetail };
       }
 
+      const data = await response.json();
       const { access, refresh } = data;
-      setAccessToken(access);
-      setRefreshToken(refresh);
 
+      // Decodificar JWT
       const decodedToken = JSON.parse(atob(access.split(".")[1]));
       const userData: User = {
         id: decodedToken.user_id,
@@ -119,13 +117,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         cedula_profesional: decodedToken.cedula_profesional,
       };
 
+      // Guardar en localStorage cifrado
       const encryptedUser = encryptData(userData);
       localStorage.setItem("accessToken", access);
       localStorage.setItem("refreshToken", refresh);
       localStorage.setItem("user", encryptedUser);
 
+      setAccessToken(access);
+      setRefreshToken(refresh);
       setUser(userData);
 
+      // Redirigir según rol
       if (userData.is_medico) router.push("/medico");
       else if (userData.is_paciente) router.push("/paciente");
       else router.push("/");
@@ -139,6 +141,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // LOGOUT
   const logout = () => {
     setAccessToken(null);
     setRefreshToken(null);
@@ -149,25 +152,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     router.replace("/");
   };
 
+  // REFRESH TOKEN
   const refreshAccessToken = async () => {
     if (!API_URL || !refreshToken) return null;
 
     try {
-      const response = await fetch(`${API_URL}/auth/token/refresh/`, {
+      const response = await fetch(`${API_URL}/token/refresh/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refresh: refreshToken }),
       });
 
-      const data = await response.json();
+      if (!response.ok) return null;
 
-      if (response.ok) {
-        setAccessToken(data.access);
-        localStorage.setItem("accessToken", data.access);
-        return data.access;
-      } else {
-        return null;
-      }
+      const data = await response.json();
+      setAccessToken(data.access);
+      localStorage.setItem("accessToken", data.access);
+      return data.access;
     } catch {
       return null;
     }
@@ -182,6 +183,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// HOOK PARA USAR AUTH
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined)
