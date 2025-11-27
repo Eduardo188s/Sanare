@@ -29,6 +29,9 @@ interface AuthContextType {
 
 const SECRET_KEY = "clave_123";
 
+// Tomamos la URL del backend desde la variable de entorno
+const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, ""); // quitar barra final
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -39,19 +42,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const encryptData = (data: object) => {
-    return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
-  };
+  const encryptData = (data: object) =>
+    CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
 
   const decryptData = (ciphertext: string) => {
     try {
       const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
       const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
-
       if (!decryptedText) return null;
-
-      const decryptedData = JSON.parse(decryptedText);
-      return decryptedData;
+      return JSON.parse(decryptedText);
     } catch {
       return null;
     }
@@ -74,9 +73,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const login = async (userNameOrEmail: string, password: string) => {
+    if (!API_URL)
+      return { success: false, message: "La URL del backend no está definida." };
+
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/auth/token/", {
+      const fetchUrl = `${API_URL}/auth/token/`;
+      console.log("Intentando conectar con:", fetchUrl);
+
+      const response = await fetch(fetchUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: userNameOrEmail, password }),
@@ -86,7 +91,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (!response.ok) {
         let errorDetail = data.detail || "Credenciales no válidas";
-        if (errorDetail.includes("No active account") || errorDetail.includes("Credenciales no válidas")) {
+        if (
+          errorDetail.includes("No active account") ||
+          errorDetail.includes("Credenciales no válidas")
+        ) {
           errorDetail = "Nombre de usuario o contraseña incorrectos.";
         }
         return { success: false, message: errorDetail };
@@ -124,7 +132,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       return { success: true };
     } catch (error) {
-      return { success: false, message: "Error desconocido al iniciar sesión." };
+      console.error("Error al conectar con backend:", error);
+      return { success: false, message: "Error en el servidor o conexión." };
     } finally {
       setLoading(false);
     }
@@ -141,14 +150,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const refreshAccessToken = async () => {
-    if (!refreshToken) return null;
+    if (!API_URL || !refreshToken) return null;
+
     try {
-      const response = await fetch("http://localhost:8000/api/auth/token/refresh/", {
+      const response = await fetch(`${API_URL}/auth/token/refresh/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refresh: refreshToken }),
       });
+
       const data = await response.json();
+
       if (response.ok) {
         setAccessToken(data.access);
         localStorage.setItem("accessToken", data.access);
@@ -162,7 +174,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, accessToken, login, logout, loading, refreshAccessToken }}>
+    <AuthContext.Provider
+      value={{ user, accessToken, login, logout, loading, refreshAccessToken }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -170,6 +184,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) throw new Error("useAuth must be used within an AuthProvider");
+  if (context === undefined)
+    throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };

@@ -69,7 +69,7 @@ export default function RegisterForm() {
 
     try {
       const cedulaResponse = await fetch(
-        `http://localhost:8000/api/auth/cedula/${medicoForm.cedula}/`
+        `https://sanarebackend-production.up.railway.app/api/auth/cedula/${medicoForm.cedula}/`
       );
       const cedulaData: CedulaData = await cedulaResponse.json();
 
@@ -155,8 +155,8 @@ export default function RegisterForm() {
     try {
             const endpoint =
         userType === "medico"
-          ? "http://localhost:8000/api/auth/register/medico/"
-          : "http://localhost:8000/api/auth/register/paciente/";
+          ? "https://sanarebackend-production.up.railway.app/api/auth/register/medico/"
+          : "https://sanarebackend-production.up.railway.app/api/auth/register/paciente/";
 
       const response = await fetch(endpoint, {
         method: "POST",
