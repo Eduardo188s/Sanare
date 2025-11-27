@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     setLoading(true);
     try {
-      const fetchUrl = `${API_URL}/auth/token/`;
+      const fetchUrl = `${API_URL}/api/auth/token/`;
       console.log("Intentando conectar con:", fetchUrl);
 
       const response = await fetch(fetchUrl, {
