@@ -1,31 +1,69 @@
-import type { NextConfig } from "next";
-const withPWA = require("next-pwa")({
+// @ts-nocheck
+import withPWA from "next-pwa";
+import runtimeCaching from "next-pwa/cache.js";
+
+export default withPWA({
   dest: "public",
   register: true,
   skipWaiting: true,
   disable: process.env.NODE_ENV === "development",
-  swSrc: "public/custom-sw.js", // Service Worker personalizado (InjectManifest)
-});
 
-const nextConfig: NextConfig = {
-  reactStrictMode: true,
+  runtimeCaching: [
+    ...runtimeCaching,
 
-  images: {
-    remotePatterns: [
-      {
-        protocol: "http",
-        hostname: "127.0.0.1",
-        port: "8000",
+    {
+      urlPattern: ({ request }) => request.mode === "navigate",
+      handler: "NetworkFirst",
+      options: {
+        cacheName: "pages-cache",
+        networkTimeoutSeconds: 8,
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 60 * 60 * 24 * 7,
+        },
       },
-    ],
-  },
-
-  // Necesario para que next-pwa no truene en App Router
-  experimental: {
-    serverActions: {
-      allowedOrigins: ["localhost:3000", "127.0.0.1:3000"],
     },
-  },
-};
 
-module.exports = withPWA(nextConfig);
+    {
+      // BACKEND — YA CORREGIDO!
+      urlPattern: /^https:\/\/sanarebackend-production\.up\.railway\.app\/.*$/i,
+      handler: "NetworkFirst",
+      options: {
+        cacheName: "api-cache",
+        networkTimeoutSeconds: 8,
+        expiration: {
+          maxEntries: 100,
+          maxAgeSeconds: 60 * 60 * 24 * 7,
+        },
+        cacheableResponse: { statuses: [0, 200] },
+      },
+    },
+
+    {
+      urlPattern: ({ request }) => request.destination === "image",
+      handler: "CacheFirst",
+      options: {
+        cacheName: "images-cache",
+        expiration: {
+          maxEntries: 100,
+          maxAgeSeconds: 60 * 60 * 24 * 30,
+        },
+      },
+    },
+
+    {
+      urlPattern: ({ request }) =>
+        ["script", "style", "font"].includes(request.destination),
+      handler: "StaleWhileRevalidate",
+      options: {
+        cacheName: "static-cache",
+      },
+    },
+  ],
+
+  reactStrictMode: true,
+  experimental: {
+    workerThreads: false,
+    cpus: 1,
+  },
+});
