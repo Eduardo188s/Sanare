@@ -2,7 +2,7 @@
 import withPWA from "next-pwa";
 import runtimeCaching from "next-pwa/cache.js";
 
-export default withPWA({
+const pwaConfig = withPWA({
   dest: "public",
   register: true,
   skipWaiting: true,
@@ -25,7 +25,7 @@ export default withPWA({
     },
 
     {
-      // BACKEND — YA CORREGIDO!
+      // BACKEND Railway
       urlPattern: /^https:\/\/sanarebackend-production\.up\.railway\.app\/.*$/i,
       handler: "NetworkFirst",
       options: {
@@ -60,10 +60,15 @@ export default withPWA({
       },
     },
   ],
+});
 
+const nextConfig = {
   reactStrictMode: true,
+
   experimental: {
     workerThreads: false,
     cpus: 1,
   },
-});
+};
+
+export default pwaConfig(nextConfig);
