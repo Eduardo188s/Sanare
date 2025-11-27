@@ -51,7 +51,7 @@ export default function MedicoDashboard() {
       if (!accessToken) return;
 
       try {
-        const res = await axios.get('http://127.0.0.1:8000/api/notificaciones/my/', {
+        const res = await axios.get('https://sanarebackend-production.up.railway.app/api/notificaciones/my/', {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
 
@@ -82,7 +82,7 @@ export default function MedicoDashboard() {
       }
 
       try {
-        const response = await axios.get('https://sanarebackend-production.up.railway.app//api/clinicas/', {
+        const response = await axios.get('https://sanarebackend-production.up.railway.app/api/clinicas/', {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
 
@@ -128,7 +128,7 @@ export default function MedicoDashboard() {
     }
 
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/clinicas/${itemToDelete}/`, {
+      await axios.delete(`https://sanarebackend-production.up.railway.app/api/clinicas/${itemToDelete}/`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
 
