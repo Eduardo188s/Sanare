@@ -1,44 +1,21 @@
-// @ts-nocheck
 
-/** 
- * CONFIGURACIÓN COMPLETA Y CORREGIDA PARA NEXT + NEXT-PWA + INJECTMANIFEST
- */
-
+// @ts-nocheck  // necesario por next-pwa + TS
 import withPWA from "next-pwa";
 import runtimeCaching from "next-pwa/cache.js";
-import { InjectManifest } from "workbox-webpack-plugin";
 
-// ---- PWA CONFIG ----
-const pwa = withPWA({
+const withPwaConfigured = withPWA({
   dest: "public",
   register: true,
   skipWaiting: true,
   disable: process.env.NODE_ENV === "development",
 
-  // -------------------------------------------------------------------
-  // 🔥 INJECTMANIFEST — IMPORTANTE PARA USAR TU ARCHIVO custom-sw.js
-  // -------------------------------------------------------------------
-  webpack(config, { isServer }) {
-    if (!isServer) {
-      config.plugins.push(
-        new InjectManifest({
-          swSrc: "./custom-sw.js",        // TU SERVICE WORKER PERSONALIZADO ORIGINAL
-          swDest: "service-worker.js",     // SE CREA EN /public AUTOMÁTICAMENTE
-        })
-      );
-    }
-    return config;
-  },
-
-  // -------------------------------------------------------------------
-  // CACHEO AUTOMÁTICO POR next-pwa
-  // -------------------------------------------------------------------
   runtimeCaching: [
     ...runtimeCaching,
 
-    // Cacheo de navegación HTML
+    // --- Navegación / Páginas ---
     {
-      urlPattern: ({ request }) => request.mode === "navigate",
+      urlPattern: ({ request, url }) =>
+        request.mode === "navigate" && !url.pathname.startsWith("/api"),
       handler: "NetworkFirst",
       options: {
         cacheName: "pages-cache",
@@ -51,7 +28,7 @@ const pwa = withPWA({
       },
     },
 
-    // 📡 API SANARE
+    // --- API Railway ---
     {
       urlPattern: /^https:\/\/sanarebackend-production\.up\.railway\.app\/.*$/i,
       handler: "NetworkFirst",
@@ -66,7 +43,7 @@ const pwa = withPWA({
       },
     },
 
-    // 🖼️ Imágenes
+    // --- Imágenes ---
     {
       urlPattern: ({ request }) => request.destination === "image",
       handler: "CacheFirst",
@@ -80,41 +57,26 @@ const pwa = withPWA({
       },
     },
 
-    // JS, CSS, FUENTES
+    // --- Scripts, CSS, Fuentes ---
     {
       urlPattern: ({ request }) =>
         ["script", "style", "font"].includes(request.destination),
       handler: "StaleWhileRevalidate",
       options: {
         cacheName: "static-cache",
+        cacheableResponse: { statuses: [0, 200] },
       },
     },
   ],
+
+  customWorkerDir: "sw.js",
 });
 
-// ---- NEXT CONFIG BASE ----
-const nextConfig = {
+export default withPwaConfigured({
   reactStrictMode: true,
-
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "sanarebackend-production.up.railway.app",
-      },
-      {
-        protocol: "http",
-        hostname: "127.0.0.1",
-        port: "8000",
-      },
-    ],
-  },
 
   experimental: {
     workerThreads: false,
     cpus: 1,
   },
-};
-
-// ---- EXPORT FINAL ----
-export default pwa(nextConfig);
+});
