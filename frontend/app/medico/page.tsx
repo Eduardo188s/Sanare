@@ -82,7 +82,7 @@ export default function MedicoDashboard() {
       }
 
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/clinicas/', {
+        const response = await axios.get('https://sanarebackend-production.up.railway.app//api/clinicas/', {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
 
