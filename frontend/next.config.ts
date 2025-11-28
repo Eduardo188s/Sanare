@@ -33,14 +33,14 @@ export default withPWA({
   skipWaiting: true,
   disable: isDev,
 
-  // 📌 MUY IMPORTANTE — Aquí va tu service worker personalizado
-  customWorkerDir: "worker",
+  // ⭐️ AQUÍ SE USA TU CUSTOM SERVICE WORKER REAL
+  swSrc: "worker/custom-sw.js",        // <-- IMPORTANTE
+  swDest: "service-worker.js",         // (opcional pero recomendado)
 
-  // 📌 Caché runtime
   runtimeCaching: [
     ...runtimeCaching,
 
-    // ⭐ Navegación (para soportar OFFLINE MODE)
+    // ⭐ Navegación offline
     {
       urlPattern: ({ request }) => request.mode === "navigate",
       handler: "NetworkFirst",
@@ -54,7 +54,7 @@ export default withPWA({
       },
     },
 
-    // ⭐ API de producción en Railway
+    // ⭐ API Railway
     {
       urlPattern:
         /^https:\/\/sanarebackend-production\.up\.railway\.app\/.*$/i,
