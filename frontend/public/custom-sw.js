@@ -1,15 +1,14 @@
-// Obligatorio para InjectManifest
-self.__WB_MANIFEST;
-
 import { registerRoute } from "workbox-routing";
 import { StaleWhileRevalidate, NetworkFirst } from "workbox-strategies";
 import { ExpirationPlugin } from "workbox-expiration";
 
-self.addEventListener("install", () => {
-  console.log("[SW] Instalado");
-});
+/*
+ * ⭐ NEXT-PWA YA MANEJA EL PRECACHE
+ * No necesitas __WB_MANIFEST.
+ * Este archivo solo agrega rutas runtime extras.
+ */
 
-// ⭐ NUEVO: Cachear inicio y páginas principales cuando está offline
+// Cache para navegación (inicio OFFLINE)
 registerRoute(
   ({ request }) => request.mode === "navigate",
   new NetworkFirst({
@@ -24,7 +23,7 @@ registerRoute(
   })
 );
 
-// Cacheo de páginas de clínicas
+// Cache de páginas /paciente/clinicas/
 registerRoute(
   ({ url }) => url.pathname.startsWith("/paciente/clinicas/"),
   new StaleWhileRevalidate({
@@ -38,7 +37,7 @@ registerRoute(
   })
 );
 
-// Cacheo de API
+// Cache API de Clínicas
 registerRoute(
   ({ url }) =>
     url.origin === "https://sanarebackend-production.up.railway.app" &&

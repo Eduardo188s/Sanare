@@ -1,29 +1,24 @@
 "use client";
-import type { Metadata } from "next";
+
 import "./globals.css";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
-import RegisterSW from "@/components/RegisterSW"; // ⬅ IMPORTANTE
-
-
+import RegisterSW from "@/components/RegisterSW"; // Servicio Worker de next-pwa
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  useEffect(() => {
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker
-      .register("/custom-sw.js")
-      .then(() => console.log("Service Worker registrado"))
-      .catch(err => console.error("Error registrando SW:", err));
-  }
-}, []);
-return (
+  return (
     <html lang="en">
+      {/* Manifest obligatorio */}
       <link rel="manifest" href="/manifest.json" />
+
       <body>
         <AuthProvider>
+          {/* next-pwa se registra automáticamente aquí */}
           <RegisterSW />
+
           {children}
+
           <Footer />
         </AuthProvider>
       </body>
