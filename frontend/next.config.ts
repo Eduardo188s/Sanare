@@ -3,16 +3,7 @@ import withPWA from "next-pwa";
 
 const isDev = process.env.NODE_ENV === "development";
 
-export default withPWA({
-  dest: "public",
-  register: true,
-  skipWaiting: true,
-  disable: isDev,
-
-  // ⭐ InjectManifest con SW personalizado
-  swSrc: "public/worker/custom-sw.js",
-  swDest: "service-worker.js",  // Se genera en /public
-})({
+const nextConfig = {
   reactStrictMode: true,
 
   images: {
@@ -28,9 +19,17 @@ export default withPWA({
       },
     ],
   },
+};
 
-  experimental: {
-    workerThreads: false,
-    cpus: 1,
-  },
-});
+export default withPWA({
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+  disable: isDev,
+
+  // ⭐ MODO CORRECTO (GenerateSW)
+  // next-pwa CONTROLARÁ EL SW
+  // tu archivo será runtime only
+  sw: "service-worker.js",
+
+})(nextConfig);
