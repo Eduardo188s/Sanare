@@ -19,24 +19,24 @@ export default function NavbarMedico() {
   const MenuItems = () => (
     <>
       <button
-        className="flex items-center p-2 rounded-md hover:bg-gray-100 md:p-2 md:hover:bg-white/20"
+        className="flex items-center p-2 rounded-md hover:bg-gray-100 md:p-2 md:hover:bg-white/20 text-gray-800 md:text-white"
         onClick={() => {
           router.push('/medico/notificaciones');
           setDrawerAbierto(false);
         }}
       >
         <Bell className="w-5 h-5 mr-2 md:mr-0 md:w-6 md:h-6" />
-        <span className="hidden md:inline ml-1 text-white md:text-white">Notificaciones</span>
+        <span className="hidden md:inline ml-1">Notificaciones</span>
       </button>
 
       <div className="relative">
         <div
-          className="flex items-center cursor-pointer md:space-x-1 p-2 md:p-0 hover:bg-gray-100 md:hover:bg-transparent rounded-md"
+          className="flex items-center cursor-pointer md:space-x-1 p-2 md:p-0 hover:bg-gray-100 md:hover:bg-transparent rounded-md text-gray-800 md:text-white"
           onClick={() => setMenuAbierto(!menuAbierto)}
         >
-          <span className="hidden md:inline font-semibold text-white">Configuración</span>
+          <span className="hidden md:inline font-semibold">Configuración</span>
           <svg
-            className={`w-4 h-4 text-white transition-transform duration-200 ${
+            className={`w-4 h-4 transition-transform duration-200 ${
               menuAbierto ? 'rotate-180' : ''
             }`}
             fill="currentColor"
@@ -62,14 +62,14 @@ export default function NavbarMedico() {
       </div>
 
       <button
-        className="flex items-center p-2 rounded-full transition-colors duration-200 hover:bg-white/20 md:p-2"
+        className="flex items-center p-2 rounded-full transition-colors duration-200 hover:bg-gray-100 md:p-2 text-gray-800 md:text-white"
         onClick={() => {
           router.push('/medico/perfil');
           setDrawerAbierto(false);
         }}
       >
         <svg
-          className="w-6 h-6 text-white hover:text-black"
+          className="w-6 h-6 hover:text-black"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -81,7 +81,7 @@ export default function NavbarMedico() {
             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
           />
         </svg>
-        <span className="hidden md:inline ml-1 text-white">Perfil</span>
+        <span className="hidden md:inline ml-1">Perfil</span>
       </button>
     </>
   );
