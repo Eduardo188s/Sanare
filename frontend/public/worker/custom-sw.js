@@ -1,15 +1,14 @@
 import { registerRoute } from "workbox-routing";
-import { StaleWhileRevalidate, NetworkFirst } from "workbox-strategies";
+import { StaleWhileRevalidate, NetworkFirst, CacheFirst } from "workbox-strategies";
 import { ExpirationPlugin } from "workbox-expiration";
 
 /*
- * ⭐ NEXT-PWA (InjectManifest) maneja el PRECACHE automáticamente.
- * NO necesitas self.__WB_MANIFEST.
- * Este archivo solo define reglas de cacheo dinámico (runtime).
+ * ⭐ Este SW SOLO maneja cache dinámico (runtime).
+ * InjectManifest ya mete el precache automático.
  */
 
 /* ---------------------------------------------------------
-   ⭐ CACHE DE NAVEGACIÓN (Soporte Offline)
+   ⭐ 1. NAVEGACIÓN OFFLINE (todas las rutas Next.js)
 --------------------------------------------------------- */
 registerRoute(
   ({ request }) => request.mode === "navigate",
@@ -18,7 +17,26 @@ registerRoute(
     networkTimeoutSeconds: 3,
     plugins: [
       new ExpirationPlugin({
-        maxEntries: 50,
+        maxEntries: 200,
+        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 días
+      }),
+    ],
+  })
+);
+
+/* ---------------------------------------------------------
+   ⭐ 2. API GENERAL — TODAS tus API del backend en Railway
+--------------------------------------------------------- */
+registerRoute(
+  ({ url }) =>
+    url.origin === "https://sanarebackend-production.up.railway.app" &&
+    url.pathname.startsWith("/api/"),
+  new NetworkFirst({
+    cacheName: "api-cache",
+    networkTimeoutSeconds: 4,
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 200,
         maxAgeSeconds: 7 * 24 * 60 * 60, // 7 días
       }),
     ],
@@ -26,46 +44,64 @@ registerRoute(
 );
 
 /* ---------------------------------------------------------
-   ⭐ CACHE DE PÁGINAS DE CLÍNICAS
+   ⭐ 3. API LOCAL (para desarrollo offline)
 --------------------------------------------------------- */
 registerRoute(
-  ({ url }) => url.pathname.startsWith("/paciente/clinicas/"),
-  new StaleWhileRevalidate({
-    cacheName: "clinicas-pages",
+  ({ url }) =>
+    url.origin === "http://127.0.0.1:8000" &&
+    url.pathname.startsWith("/api/"),
+  new NetworkFirst({
+    cacheName: "local-api-cache",
+    networkTimeoutSeconds: 4,
+  })
+);
+
+/* ---------------------------------------------------------
+   ⭐ 4. IMÁGENES
+--------------------------------------------------------- */
+registerRoute(
+  ({ request }) => request.destination === "image",
+  new CacheFirst({
+    cacheName: "images-cache",
     plugins: [
       new ExpirationPlugin({
-        maxEntries: 50,
-        maxAgeSeconds: 24 * 60 * 60, // 1 día
+        maxEntries: 200,
+        maxAgeSeconds: 60 * 24 * 60 * 60, // 60 días
       }),
     ],
   })
 );
 
 /* ---------------------------------------------------------
-   ⭐ CACHE API DE CLÍNICAS (Railway)
+   ⭐ 5. ARCHIVOS ESTÁTICOS (JS, CSS, fuentes)
 --------------------------------------------------------- */
 registerRoute(
-  ({ url }) =>
-    url.origin === "https://sanarebackend-production.up.railway.app" &&
-    url.pathname.startsWith("/api/clinicas/") &&
-    !url.pathname.includes("horarios_disponibles"),
-  new NetworkFirst({
-    cacheName: "clinicas-api-cache",
-    networkTimeoutSeconds: 3,
-    plugins: [
-      new ExpirationPlugin({
-        maxEntries: 100,
-        maxAgeSeconds: 7 * 24 * 60 * 60,
-      }),
-    ],
+  ({ request }) =>
+    ["script", "style", "font"].includes(request.destination),
+  new StaleWhileRevalidate({
+    cacheName: "static-assets",
   })
 );
 
-  registerRoute(
-    ({ request }) => request.destination === "image",
-    new StaleWhileRevalidate({
-      cacheName: "images-cache",
-      plugins: [new ExpirationPlugin({ maxEntries: 60 })],
-    })
-  );
+/* ---------------------------------------------------------
+   ⭐ 6. JSON, datos, iconos
+--------------------------------------------------------- */
+registerRoute(
+  ({ request }) =>
+    ["manifest", "json"].includes(request.destination),
+  new StaleWhileRevalidate({
+    cacheName: "data-cache",
+  })
+);
+
+/* ---------------------------------------------------------
+   ⭐ 7. FALLBACK OPCIONAL (si quieres una página offline)
+--------------------------------------------------------- */
+self.addEventListener("fetch", (event) => {
+   if (event.request.mode === "navigate") {
+     event.respondWith(
+       fetch(event.request).catch(() => caches.match("/offline.html"))
+     );
+   }
+ });
 
