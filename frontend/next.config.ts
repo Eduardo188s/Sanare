@@ -32,6 +32,7 @@ export default withPWA({
   skipWaiting: true,
   disable: isDev,
 
-  // ⭐ Usa el SW manual desde /public/worker/
-  sw: "worker/custom-sw.js",
+  // 🔥 MODO CORRECTO PARA USAR TU SW PERSONALIZADO
+  swSrc: "worker/custom-sw.js",     // ubicado en /frontend/worker/custom-sw.js
+  swDest: "service-worker.js",      // archivo final en /public
 })(nextConfig);
