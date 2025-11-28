@@ -28,16 +28,10 @@ const nextConfig = {
 
 export default withPWA({
   dest: "public",
-
   register: true,
   skipWaiting: true,
-
-  // 🔥 MODO InjectManifest (usando TU propio SW)
-  swSrc: "worker/custom-sw.js",   // <-- obligatorio
-  swDest: "service-worker.js",    // <-- opcional pero recomendado
-
-  // ❌ PROHIBIDO cuando usas InjectManifest
-  // runtimeCaching: [],   <-- ELIMINADO
-
   disable: isDev,
+
+  // ⭐ Usa el SW manual desde /public/worker/
+  sw: "worker/custom-sw.js",
 })(nextConfig);
