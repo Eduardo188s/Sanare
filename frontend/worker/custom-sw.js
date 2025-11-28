@@ -3,12 +3,14 @@ import { StaleWhileRevalidate, NetworkFirst } from "workbox-strategies";
 import { ExpirationPlugin } from "workbox-expiration";
 
 /*
- * ⭐ NEXT-PWA YA MANEJA EL PRECACHE
- * No necesitas __WB_MANIFEST.
- * Este archivo solo agrega rutas runtime extras.
+ * ⭐ NEXT-PWA (InjectManifest) maneja el PRECACHE automáticamente.
+ * NO necesitas self.__WB_MANIFEST.
+ * Este archivo solo define reglas de cacheo dinámico (runtime).
  */
 
-// Cache para navegación (inicio OFFLINE)
+/* ---------------------------------------------------------
+   ⭐ CACHE DE NAVEGACIÓN (Soporte Offline)
+--------------------------------------------------------- */
 registerRoute(
   ({ request }) => request.mode === "navigate",
   new NetworkFirst({
@@ -17,13 +19,15 @@ registerRoute(
     plugins: [
       new ExpirationPlugin({
         maxEntries: 50,
-        maxAgeSeconds: 7 * 24 * 60 * 60,
+        maxAgeSeconds: 7 * 24 * 60 * 60, // 7 días
       }),
     ],
   })
 );
 
-// Cache de páginas /paciente/clinicas/
+/* ---------------------------------------------------------
+   ⭐ CACHE DE PÁGINAS DE CLÍNICAS
+--------------------------------------------------------- */
 registerRoute(
   ({ url }) => url.pathname.startsWith("/paciente/clinicas/"),
   new StaleWhileRevalidate({
@@ -31,13 +35,15 @@ registerRoute(
     plugins: [
       new ExpirationPlugin({
         maxEntries: 50,
-        maxAgeSeconds: 24 * 60 * 60,
+        maxAgeSeconds: 24 * 60 * 60, // 1 día
       }),
     ],
   })
 );
 
-// Cache API de Clínicas
+/* ---------------------------------------------------------
+   ⭐ CACHE API DE CLÍNICAS (Railway)
+--------------------------------------------------------- */
 registerRoute(
   ({ url }) =>
     url.origin === "https://sanarebackend-production.up.railway.app" &&
@@ -49,7 +55,17 @@ registerRoute(
     plugins: [
       new ExpirationPlugin({
         maxEntries: 100,
+        maxAgeSeconds: 7 * 24 * 60 * 60,
       }),
     ],
   })
 );
+
+  registerRoute(
+    ({ request }) => request.destination === "image",
+    new StaleWhileRevalidate({
+      cacheName: "images-cache",
+      plugins: [new ExpirationPlugin({ maxEntries: 60 })],
+    })
+  );
+
