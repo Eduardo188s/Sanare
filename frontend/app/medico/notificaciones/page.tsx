@@ -108,95 +108,101 @@ export default function NotificacionesPage() {
   return (
     <main className="min-h-screen flex flex-col bg-gray-100">
       <NavbarMedico />
-      <SideBarMedico />
 
-      <section className="flex-1 ml-64 mt-16 px-6 py-10 overflow-y-auto">
-        <div className="max-w-5xl mx-auto space-y-6">
-          <h2 className="text-gray-800 text-2xl font-bold mb-6">
-            Mis notificaciones
-          </h2>
-
-          {isLoading ? (
-            <div className="flex justify-center items-center min-h-[60vh]">
-              <div className="flex flex-col items-center">
-                <div className="w-10 h-10 border-4 border-gray-300 border-t-[#6381A8] rounded-full animate-spin"></div>
-                <p className="text-xl text-gray-700 mt-4">Cargando notificaciones...</p>
-              </div>
-            </div>
-          ) : notificaciones.length === 0 ? (
-            <p className="text-gray-800">No tienes notificaciones.</p>
-          ) : (
-            <ul className="space-y-6">
-              {notificaciones.map((notif) => {
-                const clinicaNombre = notif.clinica_nombre || "Desconocida";
-                const fecha = notif.fecha_cita || "Sin fecha";
-                const hora = notif.hora_cita || "Sin hora";
-                const leida = notif.leida;
-
-                return (
-                  <li
-                    key={notif.id}
-                    onClick={() => marcarComoLeida(notif.id)}
-                    className={`bg-white rounded-2xl shadow-md hover:shadow-lg hover:scale-[1.01] transition-all duration-300 ease-in-out flex flex-col md:flex-row w-full max-w-5xl mx-auto overflow-hidden ${
-                      leida ? "border-gray-200" : "border-[#6381A8]"
-                    } cursor-pointer`}
-                  >
-                    {/* Imagen de la clínica */}
-                    <div className="md:w-100 h-56 md:h-auto shrink-0 p-4">
-                      <div className="w-full h-full rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-                        <Image
-                          src={
-                            notif.clinica?.imagen
-                              ? notif.clinica.imagen.startsWith("http")
-                                ? notif.clinica.imagen
-                                : `${process.env.NEXT_PUBLIC_API_URL ?? ""}${notif.clinica.imagen}`
-                              : `/img/${notif.clinica_nombre
-                                  ?.toLowerCase()
-                                  .replace(/\s+/g, "-")
-                                  .normalize("NFD")
-                                  .replace(/[\u0300-\u036f]/g, "") || "default-clinic"}.jpg`
-                          }
-                          alt={notif.clinica_nombre || "Clínica"}
-                          width={400}
-                          height={260}
-                          className="w-full h-full object-cover object-center"
-                          unoptimized
-                        />
-                      </div>
-                    </div>
-
-                    {/* Detalles */}
-                    <div className="flex-1 p-6 flex flex-col justify-between">
-                      <div>
-                        <div className="flex justify-between items-center mb-3">
-                          <h3 className="text-xl font-semibold text-gray-800 leading-snug">
-                            {notif.mensaje}
-                          </h3>
-                          {!leida && (
-                            <span className="text-xs px-3 py-1 rounded-full font-medium bg-blue-100 text-blue-700">
-                              Nuevo
-                            </span>
-                          )}
-                        </div>
-
-                        <p className="flex items-center gap-2 text-sm text-gray-700">
-                          <FaBuilding className="text-[#6381A8]" /> {clinicaNombre}
-                        </p>
-                        <p className="flex items-center gap-2 text-sm text-gray-700">
-                          <FaCalendarAlt className="text-[#6381A8]" /> {fecha}
-                        </p>
-                        <p className="flex items-center gap-2 text-sm text-gray-700">
-                          <FaClock className="text-[#6381A8]" /> {hora}
-                        </p>
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+      {/* Contenedor principal: sidebar + contenido */}
+      <div className="flex flex-col md:flex-row">
+        <div className="md:w-64 flex-shrink-0">
+          <SideBarMedico />
         </div>
-      </section>
+
+        <section className="flex-1 mt-16 px-4 md:px-6 lg:px-10 py-8 overflow-y-auto">
+          <div className="max-w-5xl mx-auto space-y-6">
+            <h2 className="text-gray-800 text-2xl md:text-3xl font-bold mb-6 text-center md:text-left">
+              Mis notificaciones
+            </h2>
+
+            {isLoading ? (
+              <div className="flex justify-center items-center min-h-[40vh]">
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 border-4 border-gray-300 border-t-[#6381A8] rounded-full animate-spin"></div>
+                  <p className="text-lg md:text-xl text-gray-700 mt-4">Cargando notificaciones...</p>
+                </div>
+              </div>
+            ) : notificaciones.length === 0 ? (
+              <p className="text-gray-800 text-center">No tienes notificaciones.</p>
+            ) : (
+              <ul className="space-y-6">
+                {notificaciones.map((notif) => {
+                  const clinicaNombre = notif.clinica_nombre || "Desconocida";
+                  const fecha = notif.fecha_cita || "Sin fecha";
+                  const hora = notif.hora_cita || "Sin hora";
+                  const leida = notif.leida;
+
+                  return (
+                    <li
+                      key={notif.id}
+                      onClick={() => marcarComoLeida(notif.id)}
+                      className={`bg-white rounded-2xl shadow-md hover:shadow-lg hover:scale-[1.01] transition-all duration-300 ease-in-out flex flex-col md:flex-row w-full overflow-hidden border ${
+                        leida ? "border-gray-200" : "border-[#6381A8]"
+                      } cursor-pointer`}
+                    >
+                      {/* Imagen de la clínica */}
+                      <div className="w-full md:w-64 h-48 md:h-auto shrink-0 p-4">
+                        <div className="w-full h-full rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+                          <Image
+                            src={
+                              notif.clinica?.imagen
+                                ? notif.clinica.imagen.startsWith("http")
+                                  ? notif.clinica.imagen
+                                  : `${process.env.NEXT_PUBLIC_API_URL ?? ""}${notif.clinica.imagen}`
+                                : `/img/${notif.clinica_nombre
+                                    ?.toLowerCase()
+                                    .replace(/\s+/g, "-")
+                                    .normalize("NFD")
+                                    .replace(/[\u0300-\u036f]/g, "") || "default-clinic"}.jpg`
+                            }
+                            alt={notif.clinica_nombre || "Clínica"}
+                            width={400}
+                            height={260}
+                            className="w-full h-full object-cover object-center"
+                            unoptimized
+                          />
+                        </div>
+                      </div>
+
+                      {/* Detalles */}
+                      <div className="flex-1 p-4 md:p-6 flex flex-col justify-between">
+                        <div>
+                          <div className="flex justify-between items-center mb-3">
+                            <h3 className="text-lg md:text-xl font-semibold text-gray-800 leading-snug">
+                              {notif.mensaje}
+                            </h3>
+                            {!leida && (
+                              <span className="text-xs md:text-sm px-3 py-1 rounded-full font-medium bg-blue-100 text-blue-700">
+                                Nuevo
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="flex items-center gap-2 text-sm md:text-base text-gray-700 mb-1">
+                            <FaBuilding className="text-[#6381A8]" /> {clinicaNombre}
+                          </p>
+                          <p className="flex items-center gap-2 text-sm md:text-base text-gray-700 mb-1">
+                            <FaCalendarAlt className="text-[#6381A8]" /> {fecha}
+                          </p>
+                          <p className="flex items-center gap-2 text-sm md:text-base text-gray-700">
+                            <FaClock className="text-[#6381A8]" /> {hora}
+                          </p>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

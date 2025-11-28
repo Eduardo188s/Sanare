@@ -36,10 +36,10 @@ export default function HomePage() {
       />
 
       <div
-        className="relative flex flex-col items-center justify-center min-h-screen text-center p-8 pt-20"
+        className="relative flex flex-col items-center justify-center min-h-screen text-center px-4 sm:px-8 md:px-12 pt-20"
         style={{
           backgroundImage: "url('/medicos_operando.jpg')",
-          backgroundSize: '100%',
+          backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           backgroundAttachment: 'fixed',
@@ -48,14 +48,14 @@ export default function HomePage() {
       >
         <div className="absolute inset-0 bg-[#6381A8] opacity-70"></div>
         <div className="relative z-10 flex flex-col items-center">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
             Directorio de clínicas y consultorios médicos
           </h1>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-light text-white mb-12">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light text-white mb-12">
             Encuentra el especialista ideal para ti
           </h2>
 
-          <div className="flex items-center justify-center min-h-[400px] transition-all duration-500">
+          <div className="flex items-center justify-center min-h-[300px] sm:min-h-[400px] transition-all duration-500">
             {showLogin ? (
               <LoginForm />
             ) : showRegister ? (
@@ -66,12 +66,12 @@ export default function HomePage() {
                 alt="Logo Sanare"
                 width={300}
                 height={100}
-                className="max-w-[300px] h-auto rounded-3xl cursor-pointer"
+                className="max-w-[200px] sm:max-w-[250px] md:max-w-[300px] h-auto rounded-3xl cursor-pointer"
               />
             )}
           </div>
 
-          <p className="max-w-4xl text-lg text-white mt-12 px-4">
+          <p className="max-w-4xl text-base sm:text-lg md:text-xl text-white mt-12 px-2 sm:px-4">
             Sanare ha sido diseñada para hacer tu experiencia médica más simple, rápida y organizada.
             Desde esta plataforma podrás agendar tus citas, recibir recordatorios, consultar tu historial
             y encontrar el profesional de salud adecuado para ti. Nos comprometemos a brindarte una
@@ -82,10 +82,10 @@ export default function HomePage() {
 
       {/* Especialidades */}
       <div className="w-full bg-[#ffffff] text-[#6381A8] py-16 px-4 flex flex-col items-center justify-center text-center">
-        <h2 className="text-4xl font-bold mb-12">
+        <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-4xl font-bold mb-12">
           Contamos con una amplia gama de especialidades
         </h2>
-        <div className="flex flex-wrap justify-center gap-4 max-w-5xl mx-auto">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-4 md:gap-6 max-w-5xl mx-auto">
           {[
             'Angiología', 'Traumatología', 'Ginecología', 'Cardiología',
             'Pediatría', 'Medicina Interna', 'Nutrición', 'Odontología',
@@ -94,7 +94,7 @@ export default function HomePage() {
           ].map((especialidad) => (
             <span
               key={especialidad}
-              className="cursor-pointer border border-[#6381A8] rounded-full py-2 px-6 transition-transform duration-300 hover:scale-110 hover:shadow-lg"
+              className="text-sm sm:text-base md:text-lg cursor-pointer border border-[#6381A8] rounded-full py-2 px-4 sm:py-2 sm:px-6 md:px-6 transition-transform duration-300 hover:scale-110 hover:shadow-lg"
             >
               {especialidad}
             </span>
@@ -104,23 +104,23 @@ export default function HomePage() {
 
       {/* Sección contacto */}
       <div className="w-full bg-[#6381A8] text-white flex flex-col items-center text-center py-16 px-4">
-        <div className="relative w-full max-w-4xl mx-auto mb-12">
+        <div className="relative w-full max-w-4xl mx-auto mb-12 px-2 sm:px-4">
           <div
-            className="w-full h-64 bg-cover bg-center rounded-lg"
+            className="w-full h-48 sm:h-64 bg-cover bg-center rounded-lg"
             style={{ backgroundImage: "url('/image_cirugia.jpg')" }}
           ></div>
-          <div className="absolute inset-0 bg-[#ffffff] rounded-lg flex flex-col justify-center items-center p-8">
-            <button className="bg-[#6281A8] text-[#ffffff] font-bold py-3 px-6 rounded-full mb-8">
+          <div className="absolute inset-0 bg-[#ffffff] rounded-lg flex flex-col justify-center items-center p-4 sm:p-8">
+            <button className="bg-[#6281A8] text-[#ffffff] font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-full mb-8">
               Contáctanos →
             </button>
-            <p className="text-gray-600 text-xl leading-relaxed max-w-2xl">
+            <p className="text-gray-600 text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl px-2 sm:px-0">
               Nuestra misión es simplificar el acceso a la atención médica de calidad. Con <b>Sanare</b>,
               conectamos a pacientes con un directorio de especialistas, haciendo que tu salud sea más fácil de gestionar.
             </p>
           </div>
         </div>
 
-        <div className="w-full border-t border-white mt-8 pt-4 text-center text-sm text-white">
+        <div className="w-full border-t border-white mt-8 pt-4 text-center text-sm sm:text-base text-white">
           <p>© 2025 Sanare. Todos los derechos reservados.</p>
         </div>
       </div>

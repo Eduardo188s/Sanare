@@ -75,7 +75,7 @@ export default function EditConsultorioPage() {
 
                         setDiasHabiles(consultorio.dias_habiles || []);
 
-                        const imagenURL = consultorio.imagen ? `http://127.0.0.1:8000${consultorio.imagen}` : '/clinica1.jpeg';
+                        const imagenURL = consultorio.imagen ? `https://sanarebackend-production.up.railway.app${consultorio.imagen}` : '/clinica1.jpeg';
                         try {
                             new URL(imagenURL);
                             setImagenPreview(imagenURL);
@@ -84,7 +84,6 @@ export default function EditConsultorioPage() {
                         }
                     }
                 } catch (err) {
-                    //console.error('Error al cargar consultorio existente:', err);
                     setImagenPreview('/clinica1.jpeg');
                 }
             }
@@ -187,50 +186,54 @@ export default function EditConsultorioPage() {
     return (
         <main className="min-h-screen bg-white">
             <NavbarMedico />
-            <section>
-  <div className="p-8 mt-10 bg-white text-gray-800 max-w-6xl mx-auto">
-    {/* 🔙 Botón de volver */}
-    <div className="mb-4">
-      <button
-        onClick={() => router.back()}
-        className="flex items-center gap-2 px-4 py-2 bg-[#6381A8] border border-gray-200 rounded-full shadow-sm 
-                  hover:bg-[#4f6a8f] hover:text-white hover:shadow-md transition-all duration-200 
-                  text-white font-medium"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-4 h-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
-        Volver
-      </button>
-    </div>
-                    <h1 className="text-2xl font-bold mb-6 text-center">Editar Consultorio</h1>
+            <section className="w-full">
+                <div className="p-4 sm:p-6 md:p-8 mt-4 sm:mt-6 md:mt-10 bg-white text-gray-800 max-w-6xl mx-auto">
+                    {/* Botón de volver */}
+                    <div className="mb-4 sm:mb-6">
+                        <button
+                            onClick={() => router.back()}
+                            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-[#6381A8] border border-gray-200 rounded-full shadow-sm 
+                                      hover:bg-[#4f6a8f] hover:text-white hover:shadow-md transition-all duration-200 
+                                      text-white font-medium text-sm"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="w-4 h-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                            Volver
+                        </button>
+                    </div>
 
-                    {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 text-center">Editar Consultorio</h1>
+
+                    {error && <p className="text-red-500 text-center mb-4 text-sm sm:text-base px-4">{error}</p>}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
-                            <div className="relative flex flex-col items-center">
-                                <Image
-                                    src={imagenPreview || '/clinica1.jpeg'}
-                                    alt="Portada Consultorio"
-                                    width={600}
-                                    height={400}
-                                    className="rounded-lg shadow object-cover"
-                                />
-                                <label className="absolute bottom-4 right-4 bg-white rounded-full p-3 shadow-md cursor-pointer hover:bg-gray-100 transition">
-                                    <FaCamera className="text-gray-700 text-lg" />
-                                    <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-                                </label>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mt-6 sm:mt-8 md:mt-12">
+                            {/* Imagen del consultorio */}
+                            <div className="relative flex flex-col items-center w-full">
+                                <div className="relative w-full max-w-md lg:max-w-full aspect-[3/2]">
+                                    <Image
+                                        src={imagenPreview || '/clinica1.jpeg'}
+                                        alt="Portada Consultorio"
+                                        fill
+                                        className="rounded-lg shadow object-cover"
+                                    />
+                                    <label className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 bg-white rounded-full p-2 sm:p-3 shadow-md cursor-pointer hover:bg-gray-100 transition">
+                                        <FaCamera className="text-gray-700 text-base sm:text-lg" />
+                                        <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                                    </label>
+                                </div>
                             </div>
 
-                            <div className="space-y-4">
+                            {/* Formulario */}
+                            <div className="space-y-4 w-full">
                                 <div>
                                     <label className="block text-sm font-semibold mb-1" htmlFor="nombre">Nombre del consultorio:</label>
                                     <input
@@ -239,7 +242,7 @@ export default function EditConsultorioPage() {
                                         type="text"
                                         value={formData.nombre}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                        className="w-full border border-gray-300 rounded-md p-2 sm:p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                                         required
                                     />
                                 </div>
@@ -252,7 +255,7 @@ export default function EditConsultorioPage() {
                                         rows={3}
                                         value={formData.descripcion}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                        className="w-full border border-gray-300 rounded-md p-2 sm:p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                                         required
                                     />
                                 </div>
@@ -265,22 +268,23 @@ export default function EditConsultorioPage() {
                                         type="text"
                                         value={formData.ubicacion}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                        className="w-full border border-gray-300 rounded-md p-2 sm:p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                                         required
                                     />
                                 </div>
 
                                 <div className="block">
-                                    <label className="block text-sm font-medium mb-1">Días hábiles:</label>
-                                    <div className="grid grid-cols-2 gap-2">
+                                    <label className="block text-sm font-medium mb-2">Días hábiles:</label>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 gap-2">
                                         {DIAS_SEMANA.map(d => (
-                                            <label key={d.id} className="flex items-center gap-2">
+                                            <label key={d.id} className="flex items-center gap-2 text-sm">
                                                 <input
                                                     type="checkbox"
                                                     checked={diasHabiles.includes(d.id)}
                                                     onChange={() => handleDiaChange(d.id)}
+                                                    className="w-4 h-4"
                                                 />
-                                                {d.nombre}
+                                                <span className="truncate">{d.nombre}</span>
                                             </label>
                                         ))}
                                     </div>
@@ -288,31 +292,31 @@ export default function EditConsultorioPage() {
 
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Médico responsable:</label>
-                                    <p className="text-gray-700 font-semibold">{user?.username}</p>
+                                    <p className="text-gray-700 font-semibold text-sm sm:text-base">{user?.username}</p>
                                 </div>
 
-                                <div className="flex gap-4">
-                                    <div className="w-1/2">
-                                        <label htmlFor="hora_apertura" className="block text-sm font-medium text-gray-700">Hora de Apertura</label>
+                                <div className="flex flex-col sm:flex-row gap-4">
+                                    <div className="w-full sm:w-1/2">
+                                        <label htmlFor="hora_apertura" className="block text-sm font-medium text-gray-700 mb-1">Hora de Apertura</label>
                                         <input
                                             type="time"
                                             id="hora_apertura"
                                             name="hora_apertura"
                                             value={formData.hora_apertura}
                                             onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                            className="w-full border border-gray-300 rounded-md p-2 sm:p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                                             required
                                         />
                                     </div>
-                                    <div className="w-1/2">
-                                        <label htmlFor="hora_cierre" className="block text-sm font-medium text-gray-700">Hora de Cierre</label>
+                                    <div className="w-full sm:w-1/2">
+                                        <label htmlFor="hora_cierre" className="block text-sm font-medium text-gray-700 mb-1">Hora de Cierre</label>
                                         <input
                                             type="time"
                                             id="hora_cierre"
                                             name="hora_cierre"
                                             value={formData.hora_cierre}
                                             onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                            className="w-full border border-gray-300 rounded-md p-2 sm:p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                                             required
                                         />
                                     </div>
@@ -320,7 +324,7 @@ export default function EditConsultorioPage() {
 
                                 <button
                                     type="submit"
-                                    className={`w-full py-2 px-6 rounded-3xl shadow-lg text-sm font-medium text-white transition
+                                    className={`w-full py-2 sm:py-3 px-6 rounded-3xl shadow-lg text-sm sm:text-base font-medium text-white transition
                                         ${isSubmitting ? 'bg-[#6381A8] cursor-not-allowed' : 'bg-[#6381A8] hover:bg-[#4f6a8f]'}`}
                                     disabled={isSubmitting}
                                 >

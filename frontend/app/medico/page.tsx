@@ -8,7 +8,7 @@ import axios from 'axios';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import SideBarMedico from '@/components/SideBarMedico';
-import ConfirmModal from '@/components/ConfirmModal'; // <--- AGREGADO
+import ConfirmModal from '@/components/ConfirmModal';
 
 type Medico = {
   id: number;
@@ -40,10 +40,8 @@ export default function MedicoDashboard() {
   const [hayNuevas, setHayNuevas] = useState(false);
   const pathname = usePathname();
 
-  // -------------------- ESTADOS PARA CONFIRM MODAL --------------------
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<number | null>(null);
-  // ---------------------------------------------------------------------
 
   useEffect(() => {
     const fetchNotificaciones = async () => {
@@ -110,8 +108,6 @@ export default function MedicoDashboard() {
     router.push('/medico/newConsultorio');
   };
 
-  // ------------------------- USAR MODAL EN LUGAR DE confirm() -------------------------
-
   const openDeleteModal = (id: number) => {
     setItemToDelete(id);
     setConfirmOpen(true);
@@ -140,8 +136,6 @@ export default function MedicoDashboard() {
       setItemToDelete(null);
     }
   };
-
-  // ------------------------------------------------------------------------------------
 
   const renderStars = (rating: number | undefined) => {
     if (!rating) return null;
@@ -193,26 +187,26 @@ export default function MedicoDashboard() {
         onCancel={() => setConfirmOpen(false)}
       />
 
-      <section className="flex-1 ml-64 mt-16 px-6 py-10 overflow-y-auto">
+      <section className="flex-1 ml-0 lg:ml-64 mt-16 px-4 sm:px-6 py-6 sm:py-10 overflow-y-auto">
         {(isLoading || loading) ? (
           <div className="flex justify-center items-center min-h-[60vh]">
             <div className="flex flex-col items-center">
               <div className="w-10 h-10 border-4 border-gray-300 border-t-[#6381A8] rounded-full animate-spin"></div>
-              <p className="text-xl text-gray-700 mt-4">Cargando...</p>
+              <p className="text-lg sm:text-xl text-gray-700 mt-4">Cargando...</p>
             </div>
           </div>
         ) : (
           <div className="max-w-5xl mx-auto space-y-6">
             {/* Encabezado */}
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-3xl font-bold text-gray-800">Mi Consultorio</h1>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Mi Consultorio</h1>
               <button
                 onClick={handleAddConsultorio}
                 disabled={consultorios.length > 0}
-                className={`px-6 py-2 rounded-3xl shadow transition font-medium
+                className={`w-full sm:w-auto px-6 py-2 rounded-3xl shadow transition font-medium text-sm sm:text-base
                   ${
                     consultorios.length > 0
-                      ? 'bg-[#6381A8] hover:bg-[#4f6a8f] cursor-not-allowed'
+                      ? 'bg-[#6381A8] hover:bg-[#4f6a8f] cursor-not-allowed text-white'
                       : 'bg-[#6381A8] hover:bg-[#4f6a8f] text-white'
                   }`}
               >
@@ -220,55 +214,55 @@ export default function MedicoDashboard() {
               </button>
             </div>
 
-            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+            {error && <p className="text-red-500 text-center mb-4 text-sm sm:text-base px-4">{error}</p>}
 
             {consultorios.length === 0 ? (
-              <div className="flex flex-col items-center justify-center min-h-[50vh]">
-                <p className="text-xl text-gray-500 mb-6">
+              <div className="flex flex-col items-center justify-center min-h-[50vh] px-4">
+                <p className="text-lg sm:text-xl text-gray-500 mb-6 text-center">
                   No tienes ningún consultorio registrado todavía.
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 gap-4 sm:gap-6">
                 {consultorios.map((consultorio) => (
                   <div
                     key={consultorio.id}
-                    className="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-start shadow-md transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-[1.01]"
+                    className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 flex flex-col lg:flex-row gap-4 sm:gap-6 items-start shadow-md transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-[1.01]"
                   >
                     {/* Imagen */}
-                    <div className="w-full md:w-[400px] shrink-0">
+                    <div className="w-full lg:w-[400px] shrink-0">
                       {consultorio.imagen ? (
                         <Image
                           src={consultorio.imagen}
                           alt={consultorio.nombre}
                           width={400}
                           height={300}
-                          className="rounded-xl object-cover w-full h-full"
+                          className="rounded-xl object-cover w-full h-[200px] sm:h-[250px] lg:h-full"
                           unoptimized
                         />
                       ) : (
-                        <div className="w-full h-[250px] bg-gray-200 flex items-center justify-center rounded-xl text-gray-500">
+                        <div className="w-full h-[200px] sm:h-[250px] bg-gray-200 flex items-center justify-center rounded-xl text-gray-500 text-sm">
                           Sin imagen disponible
                         </div>
                       )}
                     </div>
 
                     {/* Contenido */}
-                    <div className="grow flex flex-col justify-between">
+                    <div className="grow flex flex-col justify-between w-full">
                       <div>
-                        <h2 className="text-2xl font-bold text-gray-800 mb-1">{consultorio.nombre}</h2>
-                        <p className="text-gray-500 text-sm mb-4">{consultorio.descripcion}</p>
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1">{consultorio.nombre}</h2>
+                        <p className="text-gray-500 text-sm mb-4 line-clamp-2">{consultorio.descripcion}</p>
 
-                        <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-gray-700 text-sm">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 sm:gap-y-4 gap-x-4 sm:gap-x-8 text-gray-700 text-sm">
                           <div>
                             <span className="font-semibold">Especialidad:</span>
-                            <p className="text-gray-400">
+                            <p className="text-gray-400 truncate">
                               {consultorio.medico_responsable?.especialidad_nombre || 'No especificada'}
                             </p>
                           </div>
                           <div>
                             <span className="font-semibold">Ubicación:</span>
-                            <p className="text-gray-500">{consultorio.ubicacion}</p>
+                            <p className="text-gray-500 truncate">{consultorio.ubicacion}</p>
                           </div>
                           <div>
                             <span className="font-semibold">Horarios:</span>
@@ -284,7 +278,7 @@ export default function MedicoDashboard() {
                                 {renderStars(consultorio.calificacion)}
                                 <span className="font-medium text-gray-800">{consultorio.calificacion}</span>
                                 {consultorio.reseñas && (
-                                  <span className="text-gray-600">({consultorio.reseñas} reseñas)</span>
+                                  <span className="text-gray-600 text-xs sm:text-sm">({consultorio.reseñas} reseñas)</span>
                                 )}
                               </>
                             )}
@@ -292,21 +286,21 @@ export default function MedicoDashboard() {
                         </div>
                       </div>
 
-                      <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-sm">
-                        <span className="text-gray-500">
+                      <div className="mt-4 sm:mt-6 pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs sm:text-sm">
+                        <span className="text-gray-500 text-xs sm:text-sm">
                           {consultorio.ultima_actualizacion
                             ? `Última actualización: ${consultorio.ultima_actualizacion}`
                             : ''}
                         </span>
-                        <div className="flex space-x-3">
-                          <Link href={`/medico/editarConsultorio/${consultorio.id}`} passHref>
-                            <button className="bg-[#6381A8] hover:bg-[#4f6a8f] text-white px-5 py-2 rounded-3xl transition-colors duration-200 text-sm font-medium">
+                        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+                          <Link href={`/medico/editarConsultorio/${consultorio.id}`} passHref className="w-full sm:w-auto">
+                            <button className="w-full sm:w-auto bg-[#6381A8] hover:bg-[#4f6a8f] text-white px-5 py-2 rounded-3xl transition-colors duration-200 text-sm font-medium">
                               Editar
                             </button>
                           </Link>
                           <button
                             onClick={() => openDeleteModal(consultorio.id)}
-                            className="bg-red-600 text-white px-5 py-2 rounded-3xl hover:bg-red-700 transition-colors duration-200 text-sm font-medium"
+                            className="w-full sm:w-auto bg-red-600 text-white px-5 py-2 rounded-3xl hover:bg-red-700 transition-colors duration-200 text-sm font-medium"
                           >
                             Eliminar
                           </button>

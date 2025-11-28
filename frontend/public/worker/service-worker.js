@@ -3,12 +3,12 @@ import { StaleWhileRevalidate, NetworkFirst, CacheFirst } from "workbox-strategi
 import { ExpirationPlugin } from "workbox-expiration";
 
 /*
- * ⭐ Este SW SOLO maneja cache dinámico (runtime).
+ * Este SW SOLO maneja cache dinámico (runtime).
  * InjectManifest ya mete el precache automático.
  */
 
 /* ---------------------------------------------------------
-   ⭐ 1. NAVEGACIÓN OFFLINE (todas las rutas Next.js)
+   1. NAVEGACIÓN OFFLINE (todas las rutas Next.js)
 --------------------------------------------------------- */
 registerRoute(
   ({ request }) => request.mode === "navigate",
@@ -25,7 +25,7 @@ registerRoute(
 );
 
 /* ---------------------------------------------------------
-   ⭐ 2. API GENERAL — TODAS tus API del backend en Railway
+   2. API GENERAL — TODAS tus API del backend en Railway
 --------------------------------------------------------- */
 registerRoute(
   ({ url }) =>
@@ -44,7 +44,7 @@ registerRoute(
 );
 
 /* ---------------------------------------------------------
-   ⭐ 3. API LOCAL (para desarrollo offline)
+   3. API LOCAL (para desarrollo offline)
 --------------------------------------------------------- */
 registerRoute(
   ({ url }) =>
@@ -95,7 +95,7 @@ registerRoute(
 );
 
 /* ---------------------------------------------------------
-   ⭐ 7. FALLBACK OPCIONAL (si quieres una página offline)
+   7. FALLBACK OPCIONAL (si quieres una página offline)
 --------------------------------------------------------- */
 self.addEventListener("fetch", (event) => {
    if (event.request.mode === "navigate") {

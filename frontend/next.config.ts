@@ -27,7 +27,7 @@ export default withPWA({
   skipWaiting: true,
   disable: isDev,
 
-  // ⭐ MODO CORRECTO (GenerateSW)
+  // MODO CORRECTO (GenerateSW)
   // next-pwa CONTROLARÁ EL SW
   // tu archivo será runtime only
   sw: "service-worker.js",
