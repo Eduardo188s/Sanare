@@ -27,10 +27,9 @@ export default withPWA({
   skipWaiting: true,
   disable: isDev,
 
-  // ⭐ MODO CORRECTO PARA USAR TU PROPIO SERVICE WORKER
-  workbox: {
-    swSrc: "worker/service-worker.js",    // archivo fuente
-    swDest: "public/service-worker.js",   // archivo final en producción
-  },
+  // ⭐ MODO CORRECTO (GenerateSW)
+  // next-pwa CONTROLARÁ EL SW
+  // tu archivo será runtime only
+  sw: "service-worker.js",
 
 })(nextConfig);
