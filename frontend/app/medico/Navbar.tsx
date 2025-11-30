@@ -7,7 +7,8 @@ import {
   FaHome,
   FaUserMd,
   FaBell,
-  FaQuestionCircle
+  FaQuestionCircle,
+  FaUser
 } from 'react-icons/fa';
 
 export default function NavbarMedico({ hayNuevas = false }: { hayNuevas?: boolean }) {
@@ -113,6 +114,12 @@ export default function NavbarMedico({ hayNuevas = false }: { hayNuevas?: boolea
           <span className="text-xs text-white">Directorio de clínicas</span>
         </div>
       </div>
+      <button
+        className="p-2 rounded-full hover:bg-white/20 transition"
+                onClick={() => router.push('/medico/perfil')}
+              >
+                <FaUser className="w-6 h-6 text-white hover:text-black" />
+      </button>
 
       {/* MENÚ ESCRITORIO */}
       {/* <div className="hidden md:flex items-center space-x-4 text-white">
