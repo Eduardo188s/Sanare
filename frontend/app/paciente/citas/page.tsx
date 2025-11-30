@@ -44,8 +44,10 @@ export default function CitasPage() {
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
-  const [modalType, setModalType] = useState<"success" | "error" | "warning">("success");
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalType, setModalType] = useState<"success" | "error" | "warning">(
+    "success"
+  );
 
   const { accessToken, refreshAccessToken, loading } = useAuth();
   const router = useRouter();
@@ -103,7 +105,9 @@ export default function CitasPage() {
     const obtenerCitas = async () => {
       try {
         setCargando(true);
-        const res = await fetchWithAuth("https://sanarebackend-production.up.railway.app/api/citas/my/");
+        const res = await fetchWithAuth(
+          "https://sanarebackend-production.up.railway.app/api/citas/my/"
+        );
         if (!res.ok) {
           const errorData = await res.json();
           throw new Error(
@@ -118,13 +122,13 @@ export default function CitasPage() {
       } catch (error) {
         console.warn("No hay conexión. Cargando citas guardadas");
 
-   const cache = localStorage.getItem("citas-cache");
-   if (cache) {
-      const citasCacheadas = JSON.parse(cache);
-      setCitas(citasCacheadas);
-   } else {
-      console.warn("No hay citas en cache.");
-   }
+        const cache = localStorage.getItem("citas-cache");
+        if (cache) {
+          const citasCacheadas = JSON.parse(cache);
+          setCitas(citasCacheadas);
+        } else {
+          console.warn("No hay citas en cache.");
+        }
       } finally {
         setCargando(false);
       }
@@ -140,71 +144,68 @@ export default function CitasPage() {
 
   const confirmarCancelacion = async (id: number) => {
     if (!navigator.onLine) {
+      const db = await getDB();
+      await db.add("pending", {
+        id: Date.now(),
+        url: `https://sanarebackend-production.up.railway.app/api/citas/${id}/cancelar/`,
+        method: "PATCH",
+        body: {},
+      });
 
-    const db = await getDB();
-    await db.add("pending", {
-      id: Date.now(),
-      url: `https://sanarebackend-production.up.railway.app/api/citas/${id}/cancelar/`,
-      method: "PATCH",
-      body: {}
-    });
+      navigator.serviceWorker.ready.then((reg) => {
+        reg.sync.register("sync-citas");
+      });
 
-    navigator.serviceWorker.ready.then((reg) => {
-      reg.sync.register("sync-citas");
-    });
-
-    setModalType("warning");
-    setModalMessage(
-      "La cita se cancelará automáticamente cuando recuperes la conexión."
-    );
-    setModalOpen(true);
-
-    setCitas((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, estado: "Cancelada" } : c))
-    );
-
-    return;
-  }
-
-  try {
-    const response = await fetchWithAuth(
-      `https://sanarebackend-production.up.railway.app/api/citas/${id}/cancelar/`,
-      { method: "PATCH" }
-    );
-
-    if (!response.ok) {
-      setModalType("error");
-      setModalMessage("No se pudo cancelar la cita.");
+      setModalType("warning");
+      setModalMessage(
+        "La cita se cancelará automáticamente cuando recuperes la conexión."
+      );
       setModalOpen(true);
+
+      setCitas((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, estado: "Cancelada" } : c))
+      );
+
       return;
     }
 
-    const data = await response.json();
+    try {
+      const response = await fetchWithAuth(
+        `https://sanarebackend-production.up.railway.app/api/citas/${id}/cancelar/`,
+        { method: "PATCH" }
+      );
 
-    setModalType("success");
-    setModalMessage(data.mensaje || "La cita ha sido cancelada.");
-    setModalOpen(true);
+      if (!response.ok) {
+        setModalType("error");
+        setModalMessage("No se pudo cancelar la cita.");
+        setModalOpen(true);
+        return;
+      }
 
-    setCitas((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, estado: "Cancelada" } : c))
-    );
-  } catch {
-    setModalType("error");
-    setModalMessage("Error al cancelar la cita.");
-    setModalOpen(true);
-  }
-};
+      const data = await response.json();
 
+      setModalType("success");
+      setModalMessage(data.mensaje || "La cita ha sido cancelada.");
+      setModalOpen(true);
+
+      setCitas((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, estado: "Cancelada" } : c))
+      );
+    } catch {
+      setModalType("error");
+      setModalMessage("Error al cancelar la cita.");
+      setModalOpen(true);
+    }
+  };
 
   return (
     <main className="flex flex-col min-h-screen bg-gray-100">
-      {/* Navbar fijo */}
       <NavbarPaciente />
       <SidebarPaciente />
 
-      <div className="flex flex-1">
-        {/* Sidebar de navegación */}
-        <aside className="w-64 bg-white shadow-md border-r flex flex-col h-[calc(100vh-64px)] sticky top-16">
+      <div className="flex flex-col md:flex-row flex-1">
+        {/* SIDEBAR — aparece solo en escritorio */}
+        <aside className="hidden md:flex w-64 bg-white shadow-md border-r flex-col h-[calc(100vh-64px)] sticky top-16">
           <nav className="flex flex-col p-4 space-y-2">
             <Link
               href="/paciente"
@@ -241,14 +242,11 @@ export default function CitasPage() {
           </nav>
         </aside>
 
-        <section className="flex-1 max-w-5xl mx-auto px-4 py-10 space-y-6">
+        {/* CONTENIDO */}
+        <section className="flex-1 w-full max-w-5xl mx-auto px-4 py-10 space-y-6">
           {cargando ? (
             <div className="flex justify-center items-center h-64">
-              <div className="text-center">
-                <p className="text-gray-700 font-medium text-lg">
-                  Cargando citas...
-                </p>
-              </div>
+              <p className="text-gray-700 font-medium text-lg">Cargando citas...</p>
             </div>
           ) : citas.length === 0 ? (
             <p className="text-gray-600">No tienes citas agendadas aún.</p>
@@ -257,6 +255,7 @@ export default function CitasPage() {
               <h1 className="text-gray-800 text-2xl font-bold mb-6">
                 Mis citas agendadas
               </h1>
+
               <ul className="space-y-6">
                 {citas.map((cita) => {
                   const estado = cita.estado?.trim() || "Pendiente";
@@ -278,10 +277,10 @@ export default function CitasPage() {
                   return (
                     <li
                       key={cita.id}
-                      className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col md:flex-row transition-transform hover:scale-[1.01] border border-gray-200"
+                      className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col md:flex-row border border-gray-200 transition-transform hover:scale-[1.01]"
                     >
-                      {/* Imagen clínica */}
-                      <div className="md:w-80 h-44 md:h-auto shrink-0 p-3">
+                      {/* IMAGEN */}
+                      <div className="w-full md:w-80 h-44 md:h-auto shrink-0 p-3">
                         <div className="w-full h-full rounded-xl overflow-hidden border border-gray-200 shadow-sm">
                           <Image
                             src={
@@ -299,7 +298,7 @@ export default function CitasPage() {
                         </div>
                       </div>
 
-                      {/* Info de la cita */}
+                      {/* INFO */}
                       <div className="flex-1 p-5 flex flex-col justify-between">
                         <div>
                           <div className="flex justify-between items-center mb-2">
@@ -350,15 +349,17 @@ export default function CitasPage() {
           )}
         </section>
       </div>
+
       <ConfirmModal
-  open={confirmOpen}
-  message="¿Estás seguro de que quieres cancelar esta cita?"
-  onCancel={() => setConfirmOpen(false)}
-  onConfirm={() => {
-    setConfirmOpen(false);
-    confirmAction();
-  }}
-/>
+        open={confirmOpen}
+        message="¿Estás seguro de que quieres cancelar esta cita?"
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          confirmAction();
+        }}
+      />
+
       <Modal
         open={modalOpen}
         type={modalType}

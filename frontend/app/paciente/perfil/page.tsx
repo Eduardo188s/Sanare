@@ -28,18 +28,39 @@ export default function PerfilPaciente() {
   return (
     <main className="min-h-screen bg-gray-100">
       <NavbarPaciente />
-      <SidebarPaciente />
-      {/* Contenido principal */}
-      <section className="flex-1 ml-64 mt-16 p-8">
-        <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 flex flex-col md:flex-row justify-between gap-10">
+
+      {/* Sidebar — oculto en móviles */}
+      <div className="hidden md:block">
+        <SidebarPaciente />
+      </div>
+
+      {/* Contenido principal RESPONSIVO */}
+      <section
+        className="
+          flex-1 
+          mt-16 
+          p-4 sm:p-6 md:p-8
+          md:ml-64          /* Sidebar deja espacio solo en desktop */
+        "
+      >
+        <div
+          className="
+            max-w-5xl mx-auto 
+            bg-white rounded-2xl shadow-lg 
+            p-6 sm:p-8 
+            flex flex-col md:flex-row 
+            justify-between 
+            gap-10
+          "
+        >
           {/* Columna Izquierda */}
           <div className="flex flex-col gap-6 w-full md:w-2/3">
             <h2 className="text-lg font-semibold text-gray-800 mb-2">
               {user.is_medico ? "Médico" : "Paciente"}
             </h2>
 
-            <div className="flex items-center gap-6">
-              <div className="w-28 h-28 bg-gray-200 rounded-full overflow-hidden">
+            <div className="flex items-center gap-6 flex-wrap">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 bg-gray-200 rounded-full overflow-hidden">
                 <Image
                   src="/icons/logo_sanare.jpg"
                   alt="Foto Perfil"
@@ -48,6 +69,7 @@ export default function PerfilPaciente() {
                   className="object-cover w-full h-full"
                 />
               </div>
+
               <div>
                 <h2 className="text-xl font-semibold text-gray-800">
                   {user.full_name || user.username}
@@ -83,7 +105,7 @@ export default function PerfilPaciente() {
           </div>
 
           {/* Columna Derecha */}
-          <div className="w-full md:w-1/3 flex flex-col gap-4 mt-6 md:mt-0">
+          <div className="w-full md:w-1/3 flex flex-col gap-4">
             <div className="px-4 py-3 border rounded-lg">
               <h3 className="text-sm font-bold text-gray-700 mb-2">
                 Información Personal
@@ -95,7 +117,14 @@ export default function PerfilPaciente() {
 
             <button
               onClick={logout}
-              className="flex items-center justify-center px-4 py-3 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition"
+              className="
+                flex items-center justify-center 
+                px-4 py-3 
+                bg-red-500 text-white 
+                font-medium rounded-lg 
+                hover:bg-red-600 
+                transition
+              "
             >
               Cerrar Sesión
             </button>
