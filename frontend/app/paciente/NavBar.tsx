@@ -118,31 +118,37 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
         </button>
       </div>
 
-      {/* BOTÓN HAMBURGUESA */}
+      {/* BOTÓN HAMBURGUESA CON ANIMACIÓN */}
       <button
-        className="md:hidden p-2 rounded-lg hover:bg-white/20 transition"
-        onClick={() => setMenuMobile(true)}
+        className="md:hidden flex flex-col justify-center items-center w-10 h-10"
+        onClick={() => setMenuMobile(!menuMobile)}
       >
-        <svg
-          className="w-7 h-7 text-white"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
+        <span
+          className={`block w-6 h-0.5 bg-white mb-1 transition-all duration-300 ${
+            menuMobile ? 'rotate-45 translate-y-2' : ''
+          }`}
+        ></span>
+        <span
+          className={`block w-6 h-0.5 bg-white mb-1 transition-all duration-300 ${
+            menuMobile ? 'opacity-0' : ''
+          }`}
+        ></span>
+        <span
+          className={`block w-6 h-0.5 bg-white transition-all duration-300 ${
+            menuMobile ? '-rotate-45 -translate-y-2' : ''
+          }`}
+        ></span>
       </button>
 
       {/* PANEL MOBILE */}
       {menuMobile && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-end md:hidden">
-          <div
-            className="w-64 bg-white h-full shadow-lg p-6 flex flex-col gap-6 text-gray-900 
-            animate-slideLeft"
-          >
-            {/* Cerrar panel */}
-            <button className="self-end p-2" onClick={() => setMenuMobile(false)}>
+          <div className="w-64 bg-white h-full shadow-lg p-6 flex flex-col gap-6 text-gray-900 animate-slideLeft">
+            {/* Cerrar panel con X */}
+            <button
+              className="self-end p-2"
+              onClick={() => setMenuMobile(false)}
+            >
               <svg
                 className="w-6 h-6 text-gray-700"
                 fill="none"
@@ -154,7 +160,7 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
               </svg>
             </button>
 
-            {/* --- OPCIONES CON LOS MISMOS ICONOS DEL SIDEBAR --- */}
+            {/* OPCIONES */}
             <button
               className="flex items-center gap-3 text-lg"
               onClick={() => {
