@@ -78,7 +78,7 @@ export default function NavbarMedico({ hayNuevas = false }: { hayNuevas?: boolea
       </button>
 
       {/* AYUDA */}
-      <button
+      {/* <button
         className={`flex items-center p-3 rounded-md transition-all w-full
           ${pathname.includes('/soporte')
             ? 'bg-blue-50 text-[#6381A8] font-semibold'
@@ -91,7 +91,7 @@ export default function NavbarMedico({ hayNuevas = false }: { hayNuevas?: boolea
       >
         <FaQuestionCircle className="w-5 h-5 mr-3" />
         Ayuda y soporte
-      </button>
+      </button> */}
     </>
   );
 
