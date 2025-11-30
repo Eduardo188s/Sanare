@@ -2,6 +2,13 @@
 
 import React, { useState, ChangeEvent } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import {
+  FaHome,
+  FaCalendarAlt,
+  FaUser,
+  FaQuestionCircle,
+  FaSignOutAlt,
+} from 'react-icons/fa';
 
 interface NavbarPacienteProps {
   onSearch?: (term: string) => void;
@@ -20,12 +27,11 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
     onSearch?.(value);
   };
 
-  const isSearchDisabled = pathname !== "/paciente";
+  const isSearchDisabled = pathname !== '/paciente';
 
   return (
     <nav className="flex items-center justify-between bg-[#6381A8] p-4 border-b rounded-b-2xl border-gray-200 sticky top-0 z-50 w-full">
-      
-      {/* --- LOGO --- */}
+      {/* LOGO */}
       <div className="flex items-center space-x-2">
         <img
           src="/icons/logo_sanare.jpg"
@@ -38,7 +44,7 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
         </div>
       </div>
 
-      {/* --- BUSCADOR (oculto en teléfonos) --- */}
+      {/* BUSCADOR DESKTOP */}
       <div className="hidden md:flex flex-1 justify-center items-center">
         <div className="relative w-60">
           <input
@@ -48,9 +54,10 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
             onChange={handleChange}
             disabled={isSearchDisabled}
             className={`w-full rounded-full pl-8 pr-4 py-2 text-sm 
-              ${isSearchDisabled 
-                ? "bg-white/10 text-gray-300 cursor-not-allowed placeholder-gray-400" 
-                : "bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-white"
+              ${
+                isSearchDisabled
+                  ? 'bg-white/10 text-gray-300 cursor-not-allowed placeholder-gray-400'
+                  : 'bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-white'
               }`}
           />
           <svg
@@ -69,10 +76,9 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
         </div>
       </div>
 
-      {/* --- OPCIONES DESKTOP --- */}
+      {/* OPCIONES DESKTOP */}
       <div className="hidden md:flex items-center space-x-4">
-
-        {/* menú de configuración */}
+        {/* Configuración */}
         <div className="relative">
           <div
             className="flex items-center space-x-1 cursor-pointer"
@@ -96,9 +102,7 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
 
           {menuAbierto && (
             <div className="absolute right-0 mt-2 w-40 bg-white text-gray-800 border border-gray-200 rounded-md shadow-lg z-10">
-              <div
-                className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-              >
+              <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
                 Cerrar sesión
               </div>
             </div>
@@ -110,20 +114,11 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
           className="p-2 rounded-full hover:bg-white/20 transition"
           onClick={() => router.push('/paciente/perfil')}
         >
-          <svg
-            className="w-6 h-6 text-white hover:text-black"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
+          <FaUser className="w-6 h-6 text-white hover:text-black" />
         </button>
       </div>
 
-      {/* --- MENÚ HAMBURGUESA (SOLO TELÉFONOS) --- */}
+      {/* BOTÓN HAMBURGUESA */}
       <button
         className="md:hidden p-2 rounded-lg hover:bg-white/20 transition"
         onClick={() => setMenuMobile(true)}
@@ -135,23 +130,19 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
           strokeWidth="2"
           viewBox="0 0 24 24"
         >
-          <path strokeLinecap="round" strokeLinejoin="round"
-            d="M4 6h16M4 12h16M4 18h16"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
 
-      {/* --- PANEL MOBILE RESPONSIVO --- */}
+      {/* PANEL MOBILE */}
       {menuMobile && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-end md:hidden">
-
-          <div className="w-64 bg-white h-full shadow-lg p-6 flex flex-col gap-6 text-gray-900">
-
-            {/* cerrar panel */}
-            <button
-              className="self-end p-2"
-              onClick={() => setMenuMobile(false)}
-            >
+          <div
+            className="w-64 bg-white h-full shadow-lg p-6 flex flex-col gap-6 text-gray-900 
+            animate-slideLeft"
+          >
+            {/* Cerrar panel */}
+            <button className="self-end p-2" onClick={() => setMenuMobile(false)}>
               <svg
                 className="w-6 h-6 text-gray-700"
                 fill="none"
@@ -159,44 +150,56 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
                 strokeWidth="2"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            {/* Buscador Mobile */}
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Buscar clínica"
-                value={query}
-                onChange={handleChange}
-                disabled={isSearchDisabled}
-                className="w-full rounded-full pl-8 pr-4 py-2 text-sm bg-gray-200 text-gray-800"
-              />
-              <svg
-                className="w-4 h-4 text-gray-600 absolute top-2.5 left-2.5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round"
-                  d="M21 21l-4.35-4.35M16.65 11.32a5.33 5.33 0 11-10.66 0 5.33 5.33 0 0110.66 0z" />
-              </svg>
-            </div>
-
-            {/* Opciones */}
-            <button className="text-left text-lg" onClick={() => router.push('/paciente/perfil')}>
-              Perfil
+            {/* --- OPCIONES CON LOS MISMOS ICONOS DEL SIDEBAR --- */}
+            <button
+              className="flex items-center gap-3 text-lg"
+              onClick={() => {
+                router.push('/paciente');
+                setMenuMobile(false);
+              }}
+            >
+              <FaHome className="text-[#6381A8]" /> Inicio
             </button>
 
-            <button className="text-left text-lg">
-              Cerrar sesión
+            <button
+              className="flex items-center gap-3 text-lg"
+              onClick={() => {
+                router.push('/paciente/citas');
+                setMenuMobile(false);
+              }}
+            >
+              <FaCalendarAlt className="text-[#6381A8]" /> Mis citas
+            </button>
+
+            <button
+              className="flex items-center gap-3 text-lg"
+              onClick={() => {
+                router.push('/paciente/perfil');
+                setMenuMobile(false);
+              }}
+            >
+              <FaUser className="text-[#6381A8]" /> Perfil
+            </button>
+
+            <button
+              className="flex items-center gap-3 text-lg"
+              onClick={() => {
+                router.push('/paciente/soporte');
+                setMenuMobile(false);
+              }}
+            >
+              <FaQuestionCircle className="text-[#6381A8]" /> Ayuda y soporte
+            </button>
+
+            {/* Cerrar sesión */}
+            <button className="flex items-center gap-3 text-lg text-red-600 mt-4">
+              <FaSignOutAlt /> Cerrar sesión
             </button>
           </div>
-
         </div>
       )}
     </nav>
