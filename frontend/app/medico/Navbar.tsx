@@ -115,7 +115,7 @@ export default function NavbarMedico({ hayNuevas = false }: { hayNuevas?: boolea
       </div>
 
       {/* MENÚ ESCRITORIO */}
-      <div className="hidden md:flex items-center space-x-4 text-white">
+      {/* <div className="hidden md:flex items-center space-x-4 text-white">
         <MenuItems />
         <button
           className="p-3 hover:bg-white/20 rounded-md transition-all"
@@ -123,7 +123,7 @@ export default function NavbarMedico({ hayNuevas = false }: { hayNuevas?: boolea
         >
           Cerrar sesión
         </button>
-      </div>
+      </div> */}
 
       {/* BOTÓN MENÚ MÓVIL */}
       <div className="flex md:hidden">

@@ -79,7 +79,7 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
       {/* OPCIONES DESKTOP */}
       <div className="hidden md:flex items-center space-x-4">
         <div className="relative">
-          <div
+          {/* <div
             className="flex items-center space-x-1 cursor-pointer"
             onClick={() => setMenuAbierto(!menuAbierto)}
           >
@@ -97,7 +97,7 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
                 clipRule="evenodd"
               />
             </svg>
-          </div>
+          </div> */}
 
           {menuAbierto && (
             <div className="absolute right-0 mt-2 w-40 bg-white text-gray-800 border border-gray-200 rounded-md shadow-lg z-10">
