@@ -78,7 +78,6 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
 
       {/* OPCIONES DESKTOP */}
       <div className="hidden md:flex items-center space-x-4">
-        {/* Configuración */}
         <div className="relative">
           <div
             className="flex items-center space-x-1 cursor-pointer"
@@ -109,7 +108,6 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
           )}
         </div>
 
-        {/* Perfil */}
         <button
           className="p-2 rounded-full hover:bg-white/20 transition"
           onClick={() => router.push('/paciente/perfil')}
@@ -118,7 +116,7 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
         </button>
       </div>
 
-      {/* BOTÓN HAMBURGUESA CON ANIMACIÓN */}
+      {/* BOTÓN HAMBURGUESA (ANIMADO) */}
       <button
         className="md:hidden flex flex-col justify-center items-center w-10 h-10"
         onClick={() => setMenuMobile(!menuMobile)}
@@ -160,45 +158,49 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
               </svg>
             </button>
 
-            {/* OPCIONES */}
+            {/* OPCIONES (MATCH del SidebarPaciente) */}
             <button
-              className="flex items-center gap-3 text-lg"
+              className="flex items-center gap-3 text-lg text-gray-900"
               onClick={() => {
                 router.push('/paciente');
                 setMenuMobile(false);
               }}
             >
-              <FaHome className="text-[#6381A8]" /> Inicio
+              <FaHome className="text-[#6381A8]" />
+              Inicio
             </button>
 
             <button
-              className="flex items-center gap-3 text-lg"
+              className="flex items-center gap-3 text-lg text-gray-900"
               onClick={() => {
                 router.push('/paciente/citas');
                 setMenuMobile(false);
               }}
             >
-              <FaCalendarAlt className="text-[#6381A8]" /> Mis citas
+              <FaCalendarAlt className="text-[#6381A8]" />
+              Mis citas
             </button>
 
             <button
-              className="flex items-center gap-3 text-lg"
+              className="flex items-center gap-3 text-lg text-gray-900"
               onClick={() => {
                 router.push('/paciente/perfil');
                 setMenuMobile(false);
               }}
             >
-              <FaUser className="text-[#6381A8]" /> Perfil
+              <FaUser className="text-[#6381A8]" />
+              Perfil
             </button>
 
             <button
-              className="flex items-center gap-3 text-lg"
+              className="flex items-center gap-3 text-lg text-gray-900"
               onClick={() => {
                 router.push('/paciente/soporte');
                 setMenuMobile(false);
               }}
             >
-              <FaQuestionCircle className="text-[#6381A8]" /> Ayuda y soporte
+              <FaQuestionCircle className="text-[#6381A8]" />
+              Ayuda y soporte
             </button>
 
             {/* Cerrar sesión */}
