@@ -192,7 +192,7 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
               Perfil
             </button>
 
-            <button
+            {/* <button
               className="flex items-center gap-3 text-lg text-gray-900"
               onClick={() => {
                 router.push('/paciente/soporte');
@@ -201,7 +201,7 @@ export default function NavbarPaciente({ onSearch }: NavbarPacienteProps) {
             >
               <FaQuestionCircle className="text-[#6381A8]" />
               Ayuda y soporte
-            </button>
+            </button> */}
 
             {/* Cerrar sesión */}
             <button className="flex items-center gap-3 text-lg text-red-600 mt-4">
