@@ -42,7 +42,6 @@ export default function CitasPage() {
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
-
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState<"success" | "error" | "warning">(
@@ -53,6 +52,7 @@ export default function CitasPage() {
   const router = useRouter();
   const pathname = usePathname();
 
+  /** ---------------------- AUTORIZACIÓN ---------------------- **/
   const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
     let token = accessToken;
 
@@ -99,6 +99,7 @@ export default function CitasPage() {
     return response;
   };
 
+  /** ---------------------- OBTENER CITAS ---------------------- **/
   useEffect(() => {
     if (loading) return;
 
@@ -108,26 +109,25 @@ export default function CitasPage() {
         const res = await fetchWithAuth(
           "https://sanarebackend-production.up.railway.app/api/citas/my/"
         );
+
         if (!res.ok) {
           const errorData = await res.json();
           throw new Error(
-            `Error al obtener las citas: ${res.status} ${res.statusText} - ${JSON.stringify(
+            `Error: ${res.status} ${res.statusText} - ${JSON.stringify(
               errorData
             )}`
           );
         }
+
         const data = await res.json();
         localStorage.setItem("citas-cache", JSON.stringify(data));
         setCitas(data);
       } catch (error) {
-        console.warn("No hay conexión. Cargando citas guardadas");
+        console.warn("No hay conexión. Cargando desde cache.");
 
         const cache = localStorage.getItem("citas-cache");
         if (cache) {
-          const citasCacheadas = JSON.parse(cache);
-          setCitas(citasCacheadas);
-        } else {
-          console.warn("No hay citas en cache.");
+          setCitas(JSON.parse(cache));
         }
       } finally {
         setCargando(false);
@@ -137,6 +137,7 @@ export default function CitasPage() {
     obtenerCitas();
   }, [loading, accessToken, refreshAccessToken, router]);
 
+  /** ---------------------- CANCELAR CITA ---------------------- **/
   const cancelarCita = async (id: number) => {
     setConfirmAction(() => () => confirmarCancelacion(id));
     setConfirmOpen(true);
@@ -200,11 +201,16 @@ export default function CitasPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-gray-100">
+      {/* NAVBAR */}
       <NavbarPaciente />
-      <SidebarPaciente />
+
+      {/* ✅ SIDEBAR — SOLO EN ESCRITORIO */}
+      <div className="hidden md:block">
+        <SidebarPaciente />
+      </div>
 
       <div className="flex flex-col md:flex-row flex-1">
-        {/* SIDEBAR — aparece solo en escritorio */}
+        {/* SIDEBAR OPCIONAL DEL LADO IZQUIERDO (solo escritorio) */}
         <aside className="hidden md:flex w-64 bg-white shadow-md border-r flex-col h-[calc(100vh-64px)] sticky top-16">
           <nav className="flex flex-col p-4 space-y-2">
             <Link
@@ -242,11 +248,13 @@ export default function CitasPage() {
           </nav>
         </aside>
 
-        {/* CONTENIDO */}
+        {/* -------------------- CONTENIDO -------------------- */}
         <section className="flex-1 w-full max-w-5xl mx-auto px-4 py-10 space-y-6">
           {cargando ? (
             <div className="flex justify-center items-center h-64">
-              <p className="text-gray-700 font-medium text-lg">Cargando citas...</p>
+              <p className="text-gray-700 font-medium text-lg">
+                Cargando citas...
+              </p>
             </div>
           ) : citas.length === 0 ? (
             <p className="text-gray-600">No tienes citas agendadas aún.</p>
@@ -334,7 +342,7 @@ export default function CitasPage() {
                           <div className="mt-4 text-right">
                             <button
                               onClick={() => cancelarCita(cita.id)}
-                              className="bg-linear-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2 rounded-xl text-sm shadow-md transition-all"
+                              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm shadow-md transition-all"
                             >
                               Cancelar cita
                             </button>
@@ -350,6 +358,7 @@ export default function CitasPage() {
         </section>
       </div>
 
+      {/* MODALES */}
       <ConfirmModal
         open={confirmOpen}
         message="¿Estás seguro de que quieres cancelar esta cita?"
